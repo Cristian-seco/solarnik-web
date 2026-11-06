@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; manifest-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Asistente SOLARNIK</title>
+<meta name="description" content="Agenda tu evaluación técnica de respaldo energético o netbilling con SOLARNIK, una empresa IN-ELEC.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0F1A1F">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&display=swap">
+<style>
+:root{--bg:#0F1A1F;--surface:#15252C;--surface2:#1B3039;--ink:#E6F1F4;--muted:#9FB3BB;--line:#24414B;--accent:#F5A73A;--cyan:#3CC6DA;--ok:#2FB36D;--err:#FF7A6B}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow-x:clip}
+body{background:radial-gradient(900px 500px at 100% -10%,rgba(60,198,218,.12),transparent 60%),radial-gradient(700px 500px at -10% 110%,rgba(245,167,58,.10),transparent 60%),var(--bg);color:var(--ink);font:16px/1.5 "Archivo","Helvetica Neue",Arial,sans-serif;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:rgba(15,26,31,.85);backdrop-filter:blur(8px);position:sticky;top:0;z-index:2}
+header img{width:42px;height:42px;border-radius:12px;background:#fff;padding:4px}
+header b{display:block;font-weight:800;letter-spacing:.06em}
+header small{color:var(--muted);font-size:13px}
+header .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;box-shadow:0 0 8px var(--ok)}
+header a{margin-left:auto;color:var(--muted);font-size:13px;text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:20px}
+main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 16px 140px}
+.msg{display:flex;margin:10px 0;animation:in .25s ease-out}
+.msg .b{max-width:85%;padding:12px 16px;border-radius:18px;white-space:pre-line}
+.bot .b{background:var(--surface);border:1px solid var(--line);border-top-left-radius:6px}
+.me{justify-content:flex-end}.me .b{background:linear-gradient(135deg,#F5A73A,#E5873A);color:#1F2D35;font-weight:600;border-top-right-radius:6px}
+.typing .b{display:flex;gap:5px;padding:16px}.typing i{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bl 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#dock{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 22%);padding:22px 16px calc(16px + env(safe-area-inset-bottom))}
+#dock .in{max-width:640px;margin:0 auto}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opt{flex:1 1 auto;min-width:46%;border:1.5px solid var(--cyan);background:rgba(60,198,218,.08);color:var(--ink);font:600 15px "Archivo",sans-serif;padding:13px 14px;border-radius:14px;cursor:pointer;text-align:left;transition:background .15s,transform .1s}
+.opt:hover{background:rgba(60,198,218,.18)}.opt:active{transform:scale(.98)}
+.row{display:flex;gap:10px}
+.row input{flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--line);color:var(--ink);font:16px "Archivo",sans-serif;padding:14px;border-radius:14px}
+.row input:focus{outline:none;border-color:var(--cyan)}
+.go{border:0;cursor:pointer;font:800 16px "Archivo",sans-serif;color:#1F2D35;padding:0 20px;border-radius:14px;background:linear-gradient(135deg,#F5A73A,#F39A1E 55%,#E5873A);box-shadow:0 5px 0 #B86A10,0 8px 20px rgba(243,154,30,.3)}
+.go:active{transform:translateY(3px);box-shadow:0 2px 0 #B86A10}
+.go[disabled]{opacity:.5;cursor:wait}
+.err{color:var(--err);font-size:13px;margin:8px 2px 0;min-height:18px}
+.cons{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:10px 2px 0}
+.cons a{color:var(--cyan)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.final{display:grid;gap:10px}
+.final a{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font:800 16px "Archivo",sans-serif;padding:16px;border-radius:14px}
+.wa{background:#25D366;color:#073B20;box-shadow:0 5px 0 #149447}
+.calc{border:1.5px solid var(--cyan);color:var(--ink)}
+.prog{height:4px;background:var(--line);border-radius:2px;margin-bottom:12px;overflow:hidden}.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--accent));transition:width .3s}
+.sum{font-size:14px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <img src="favicon.svg" alt="">
+  <div><b>SOLARNIK</b><small><span class="dot"></span>Asistente de evaluación</small></div>
+  <a href="index.html">Ir a la web</a>
+</header>
+<main id="chat" aria-live="polite"></main>
+<div id="dock"><div class="in"><div class="prog"><i id="pg"></i></div><div id="ctl"></div></div></div>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://soarlsfonkhgbwcwaruj.supabase.co';
+const SUPABASE_KEY='sb_publishable_8tEL5QE-Ph_42xVj6vkDVA_nT9fbChU'; // clave pública; los permisos los controla RLS
+const WHATSAPP=''; // número en formato 569XXXXXXXX; vacío = se oculta el botón
+const chat=document.getElementById('chat'),ctl=document.getElementById('ctl'),pg=document.getElementById('pg');
+const qs=new URLSearchParams(location.search);
+const d={origen:qs.get('src')==='ig'?'instagram':'asistente'};
+const T0=Date.now();
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function add(who,text){const m=document.createElement('div');m.className='msg '+who;const b=document.createElement('div');b.className='b';b.textContent=text;m.appendChild(b);chat.appendChild(m);scroll()}
+function scroll(){requestAnimationFrame(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}))}
+async function say(...lines){for(const t of lines){const ty=document.createElement('div');ty.className='msg bot typing';ty.innerHTML='<div class="b"><i></i><i></i><i></i></div>';chat.appendChild(ty);scroll();await wait(Math.min(1100,350+t.length*12));ty.remove();add('bot',t)}}
+function prog(n){pg.style.width=(n/7*100)+'%'}
+function choose(opts){return new Promise(res=>{ctl.innerHTML='<div class="opts"></div>';const box=ctl.firstChild;opts.forEach(([v,l])=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=l;b.onclick=()=>{ctl.innerHTML='';add('me',l);res(v)};box.appendChild(b)})})}
+function ask(ph,type,check,extra){return new Promise(res=>{
+  ctl.innerHTML='<div class="row"><input id="tx" autocomplete="'+(type==='tel'?'tel':'on')+'" '+(type==='tel'?'inputmode="tel" type="tel"':'type="text"')+' maxlength="80" placeholder="'+esc(ph)+'"><button class="go" id="ok" type="button">Enviar</button></div>'+(extra||'')+'<div class="err" id="er"></div>';
+  const tx=document.getElementById('tx'),er=document.getElementById('er');tx.focus();
+  const go=()=>{const v=tx.value.trim();const e=check(v);if(e){er.textContent=e;return}ctl.innerHTML='';add('me',type==='tel'?v:v);res(v)};
+  document.getElementById('ok').onclick=go;tx.onkeydown=e=>{if(e.key==='Enter')go()};tx.oninput=()=>{er.textContent=''};
+})}
+async function run(){
+  prog(0);
+  await say('Hola 👋 Soy el asistente de SOLARNIK.','En menos de 1 minuto te ayudo a agendar una evaluación técnica sin costo de tu proyecto.');
+  await say('¿Qué te interesa resolver?');
+  d.interes=await choose([['respaldo','⚡ Respaldo ante cortes de luz'],['ahorro','☀️ Ahorrar en mi boleta (netbilling)'],['ambos','🔋 Ambas cosas'],['otro','🛠️ Otro servicio eléctrico']]);prog(1);
+  await say(d.interes==='respaldo'?'Entendido. Un sistema híbrido con baterías mantiene tu casa funcionando cuando la red falla.':d.interes==='ahorro'?'Perfecto. Con netbilling generas tu energía y los excedentes se descuentan de tu boleta.':d.interes==='ambos'?'Excelente: un sistema híbrido te da respaldo y ahorro a la vez.':'Claro, también realizamos proyectos e instalaciones eléctricas en general.');
+  await say('¿Dónde sería la instalación?');
+  d.propiedad=await choose([['casa','🏠 Casa'],['parcela_pozo','🌾 Parcela con pozo o bomba'],['negocio','🏪 Negocio o empresa']]);prog(2);
+  if(d.propiedad==='parcela_pozo')await say('Importante: en una parcela, sin electricidad tampoco hay agua. Lo consideramos en el diseño del respaldo.');
+  await say('¿En qué región?');
+  d.region=await choose([['Coquimbo','Coquimbo'],['Valparaíso','Valparaíso'],['Metropolitana','Metropolitana'],['O’Higgins','O’Higgins'],['Otra','Otra región']]);prog(3);
+  await say('¿Y en qué comuna?');
+  d.comuna=await ask('Ej: La Ligua','text',v=>v.length<2?'Escribe el nombre de tu comuna':v.length>60?'Máximo 60 caracteres':!/^[\p{L} .'’-]+$/u.test(v)?'Usa solo letras':'');prog(4);
+  await say('¿Cuánto pagas aproximadamente de luz al mes?');
+  d.boleta=await choose([['<40','Menos de $40.000'],['40-80','$40.000 – $80.000'],['80-150','$80.000 – $150.000'],['>150','Más de $150.000'],['nose','No lo sé']]);prog(5);
+  await say('¿Con qué frecuencia te quedas sin luz?');
+  d.cortes=await choose([['frecuentes','Varias veces al año'],['a_veces','A veces'],['casi_nunca','Casi nunca']]);prog(6);
+  await say('Último paso. ¿Cuál es tu nombre?');
+  d.nombre=await ask('Tu nombre','text',v=>v.length<2?'Escribe tu nombre':v.length>80?'Máximo 80 caracteres':!/^[\p{L} .'’-]+$/u.test(v)?'Usa solo letras':'');
+  await say('Gracias, '+d.nombre.split(' ')[0]+'. ¿A qué número de WhatsApp te contactamos?');
+  await phoneStep();
+}
+function phoneStep(){return new Promise(res=>{
+  ctl.innerHTML='<div class="row"><input id="tx" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" placeholder="+56 9 1234 5678"><button class="go" id="ok" type="button">Enviar</button></div>'+
+  '<input class="hp" id="hp" tabindex="-1" autocomplete="off" aria-hidden="true">'+
+  '<label class="cons"><input type="checkbox" id="cs"> Acepto que SOLARNIK (IN-ELEC SpA) use mis datos solo para contactarme por esta solicitud, según la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</label><div class="err" id="er"></div>';
+  const tx=document.getElementById('tx'),er=document.getElementById('er'),ok=document.getElementById('ok');tx.focus();
+  const go=async()=>{
+    let v=tx.value.replace(/[^\d+ ]/g,'').trim();
+    const digits=v.replace(/\D/g,'');
+    if(!/^\+?[0-9 ]{8,15}$/.test(v)||digits.length<8){er.textContent='Revisa el número (ej: +56 9 1234 5678)';return}
+    if(!document.getElementById('cs').checked){er.textContent='Debes aceptar el uso de tus datos para que te contactemos';return}
+    if(document.getElementById('hp').value||Date.now()-T0<6000){er.textContent='No se pudo enviar. Intenta nuevamente.';return}
+    d.telefono=v;ok.disabled=true;ok.textContent='…';
+    const body={nombre:d.nombre,telefono:d.telefono,region:d.region,comuna:d.comuna,consentimiento:true,interes:d.interes,propiedad:d.propiedad,boleta:d.boleta,cortes:d.cortes,origen:d.origen};
+    try{
+      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
+      if(!r.ok)throw new Error(r.status);
+    }catch(e){ok.disabled=false;ok.textContent='Enviar';er.textContent='No pudimos registrar tu solicitud. Revisa tu conexión e inténtalo de nuevo.';return}
+    ctl.innerHTML='';add('me',d.telefono);prog(7);res();done();
+  };
+  ok.onclick=go;tx.onkeydown=e=>{if(e.key==='Enter')go()};tx.oninput=()=>{er.textContent=''};
+})}
+async function done(){
+  const L={respaldo:'respaldo ante cortes',ahorro:'ahorro con netbilling',ambos:'respaldo y ahorro',otro:'otro servicio eléctrico'};
+  await say('✅ ¡Listo! Tu solicitud de evaluación técnica quedó registrada.','Un especialista SOLARNIK te contactará por WhatsApp para coordinar la visita.');
+  let h='<div class="final">';
+  if(WHATSAPP){const t='Hola SOLARNIK, soy '+d.nombre+' de '+d.comuna+'. Me interesa '+L[d.interes]+'. Acabo de dejar mis datos en el asistente.';h+='<a class="wa" href="https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent(t)+'" target="_blank" rel="noopener">💬 Continuar por WhatsApp</a>'}
+  h+='<a class="calc" href="index.html#consumo">⚡ Mientras tanto, calcula tu sistema</a></div>';
+  ctl.innerHTML=h;
+}
+run();
+})();
+</script>
+</body>
+</html>

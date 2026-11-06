@@ -55,3 +55,15 @@ alter table public.feedback force row level security;
 revoke all on public.feedback from anon, authenticated;
 grant insert (logro, confuso, visita, freno, nota, edad, vivienda, dispositivo, comentario) on public.feedback to anon;
 create policy "feedback_insert_publico" on public.feedback for insert to anon with check (true);
+
+-- Asistente de evaluación (asistente.html): campos adicionales del lead, solo INSERT para el público
+alter table public.leads
+  add column if not exists interes   text check (interes in ('respaldo','ahorro','ambos','otro')),
+  add column if not exists propiedad text check (propiedad in ('casa','parcela_pozo','negocio')),
+  add column if not exists boleta    text check (boleta in ('<40','40-80','80-150','>150','nose')),
+  add column if not exists cortes    text check (cortes in ('frecuentes','a_veces','casi_nunca')),
+  add column if not exists origen    text check (origen in ('web','asistente','instagram'));
+revoke all on public.leads from anon, authenticated;
+grant insert (nombre, telefono, region, comuna, techo, consentimiento, kwh_mes, hsp_junio,
+              interes, propiedad, boleta, cortes, origen)
+  on public.leads to anon;
