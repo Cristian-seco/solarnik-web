@@ -32,3 +32,6 @@ create policy "leads_insert_publico" on public.leads
 -- No se crean políticas de SELECT, UPDATE ni DELETE:
 -- con RLS activo, esas acciones quedan denegadas para anon y authenticated.
 -- Cristian lee los contactos desde el panel de Supabase (Table Editor).
+
+-- IMPORTANTE: si se cambia la exposición de la tabla en "Data API", Supabase vuelve a
+-- otorgar todos los privilegios a anon/authenticated. Re-ejecutar el bloque revoke/grant de arriba.
