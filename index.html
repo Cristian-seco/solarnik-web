@@ -930,6 +930,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .thint{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;transition:opacity .3s}
 .thint.hide{opacity:0}
 @media (max-width:640px){.tscroll{max-height:62vh}}
+.gpsbig{width:100%;font:inherit;font-weight:800;font-size:16px;padding:14px;border-radius:12px;border:2px solid #3CC6DA;background:rgba(60,198,218,.12);color:#3CC6DA;cursor:pointer}
+.gpsbig small{font-weight:500;font-size:12px;color:var(--muted)}
+.gpsbig:hover{background:#3CC6DA;color:#06222a}.gpsbig:hover small{color:#06222a}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -1057,8 +1060,9 @@ html,body{overflow-x:clip}
       <label for="kwh">Consumo mensual de invierno (kWh, boleta de junio o julio)<input id="kwh" type="number" min="20" step="10" placeholder="Viene del Paso 1 o escríbelo de tu boleta"></label>
       <label>Ubica tu casa: haz clic sobre tu techo en el mapa</label>
       <div id="map" role="application" aria-label="Mapa para ubicar la vivienda"></div>
-      <div class="maptools"><input id="coord" placeholder="o pega coordenadas de Google Maps: -32.41, -71.40" aria-label="Coordenadas"><button type="button" id="coordbtn">Ubicar</button><button type="button" id="gpsbtn">📍 Mi ubicación</button></div>
-      <p class="note" id="msrc" style="margin:-6px 0 0">Elige un punto en el mapa o, si prefieres, tu comuna.</p>
+      <button type="button" id="gpsbtn" class="gpsbig">📍 Usar mi ubicación <small>(recomendado, el celular la detecta)</small></button>
+      <div class="maptools"><input id="coord" placeholder="o pega coordenadas de Google Maps: -32.41, -71.40" aria-label="Coordenadas"><button type="button" id="coordbtn">Ubicar</button></div>
+      <p class="note" id="msrc" style="margin:-6px 0 0">Usa tu ubicación, haz clic sobre tu techo en el mapa, pega coordenadas o elige tu comuna.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label for="hreg">Región<select id="hreg"></select></label><label for="hcom">Comuna<select id="hcom"></select></label></div>
       <p class="note" id="hsrc" style="margin:-6px 0 0"></p>
       <label for="prod">Horas sol pico de junio, HSP (h/día, del Explorador Solar)<input id="prod" type="number" min="1" max="8" step="0.1" placeholder="Se completa al ubicar tu casa"></label>
@@ -1332,7 +1336,7 @@ html,body{overflow-x:clip}
     map.on('click',e=>place(e.latlng.lat,e.latlng.lng));
   }catch(e){$('map').style.display='none';}
   $('coordbtn').onclick=()=>{const m=$('coord').value.match(/(-?\d+(?:\.\d+)?)\s*[,; ]\s*(-?\d+(?:\.\d+)?)/);if(!m){$('msrc').textContent='Formato no reconocido. Ejemplo: -32.4100, -71.4000';return;}let a=+m[1],b=+m[2];if(a<-60||a>-15||b<-80||b>-60){$('msrc').textContent='Las coordenadas no están en Chile continental.';return;}if(map)place(a,b,16);else apply(a,b);};
-  $('gpsbtn').onclick=()=>{if(!navigator.geolocation){$('msrc').textContent='Tu navegador no entrega la ubicación. Usa el mapa o pega coordenadas.';return;}$('msrc').textContent='Buscando tu ubicación...';navigator.geolocation.getCurrentPosition(p=>{map?place(p.coords.latitude,p.coords.longitude,17):apply(p.coords.latitude,p.coords.longitude)},()=>{$('msrc').textContent='No se pudo obtener la ubicación (en esta vista previa el navegador la bloquea; en el sitio publicado pedirá permiso). Usa el mapa o pega coordenadas.';},{enableHighAccuracy:true,timeout:10000});};
+  $('gpsbtn').onclick=()=>{if(!navigator.geolocation){$('msrc').textContent='Tu navegador no entrega la ubicación. Usa el mapa o pega coordenadas.';return;}$('msrc').textContent='Buscando tu ubicación... acepta el permiso que pide tu navegador.';navigator.geolocation.getCurrentPosition(p=>{map?place(p.coords.latitude,p.coords.longitude,17):apply(p.coords.latitude,p.coords.longitude)},()=>{$('msrc').textContent='No se pudo obtener la ubicación (en esta vista previa el navegador la bloquea; en el sitio publicado pedirá permiso). Usa el mapa o pega coordenadas.';},{enableHighAccuracy:true,timeout:10000});};
 })();
 </script>
 
