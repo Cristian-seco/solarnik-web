@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://server.arcgisonline.com https://tile.openstreetmap.org; connect-src https://*.supabase.co https://nominatim.openstreetmap.org; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
@@ -933,6 +933,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .gpsbig{width:100%;font:inherit;font-weight:800;font-size:16px;padding:14px;border-radius:12px;border:2px solid #3CC6DA;background:rgba(60,198,218,.12);color:#3CC6DA;cursor:pointer}
 .gpsbig small{font-weight:500;font-size:12px;color:var(--muted)}
 .gpsbig:hover{background:#3CC6DA;color:#06222a}.gpsbig:hover small{color:#06222a}
+.adv{border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.adv summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:600}
+.maptools input{font-size:15px}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -1055,17 +1058,19 @@ html,body{overflow-x:clip}
   <div>
     <div class="eyebrow">Paso 2 · Calculadora</div>
     <h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué tamaño de sistema necesitas?</h2>
-    <p style="color:var(--muted);margin:0 0 18px;max-width:52ch">Ubica tu casa en el mapa o elige tu comuna: cargamos las horas sol pico (HSP) de junio, el mes con menos sol, desde el <a href="https://solar.minenergia.cl/exploracion" target="_blank" rel="noopener">Explorador Solar del Ministerio de Energía</a>. Si conoces el valor exacto de tu techo, puedes reemplazarlo.</p>
+    <p style="color:var(--muted);margin:0 0 18px;max-width:52ch">Dinos tu consumo y dónde está tu casa. Usamos la radiación solar de junio, el mes con menos sol, del <a href="https://solar.minenergia.cl/exploracion" target="_blank" rel="noopener">Explorador Solar del Ministerio de Energía</a>.</p>
     <form id="simform">
       <label for="kwh">Consumo mensual de invierno (kWh, boleta de junio o julio)<input id="kwh" type="number" min="20" step="10" placeholder="Viene del Paso 1 o escríbelo de tu boleta"></label>
-      <label>Ubica tu casa: haz clic sobre tu techo en el mapa</label>
+      <label style="font-size:15px">Ubica tu casa</label>
+      <button type="button" id="gpsbtn" class="gpsbig">📍 Usar mi ubicación <small>(recomendado)</small></button>
+      <div class="maptools"><input id="coord" placeholder="o escribe tu dirección o sector (ej: Pullally, Papudo)" aria-label="Dirección, sector o coordenadas" enterkeyhint="search"><button type="button" id="coordbtn">Buscar</button></div>
       <div id="map" role="application" aria-label="Mapa para ubicar la vivienda"></div>
-      <button type="button" id="gpsbtn" class="gpsbig">📍 Usar mi ubicación <small>(recomendado, el celular la detecta)</small></button>
-      <div class="maptools"><input id="coord" placeholder="o pega coordenadas de Google Maps: -32.41, -71.40" aria-label="Coordenadas"><button type="button" id="coordbtn">Ubicar</button></div>
-      <p class="note" id="msrc" style="margin:-6px 0 0">Usa tu ubicación, haz clic sobre tu techo en el mapa, pega coordenadas o elige tu comuna.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label for="hreg">Región<select id="hreg"></select></label><label for="hcom">Comuna<select id="hcom"></select></label></div>
-      <p class="note" id="hsrc" style="margin:-6px 0 0"></p>
+      <p class="note" id="msrc" style="margin:-6px 0 0">Si el punto no queda justo sobre tu casa, haz clic sobre tu techo en el mapa.</p>
+      <details class="adv"><summary>Opciones avanzadas (comuna y horas de sol)</summary>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px"><label for="hreg">Región<select id="hreg"></select></label><label for="hcom">Comuna<select id="hcom"></select></label></div>
+      <p class="note" id="hsrc" style="margin:6px 0 0"></p>
       <label for="prod">Horas sol pico de junio, HSP (h/día, del Explorador Solar)<input id="prod" type="number" min="1" max="8" step="0.1" placeholder="Se completa al ubicar tu casa"></label>
+      </details>
       <label for="cob">¿Cuánto de tu consumo quieres cubrir?<select id="cob"><option value="0.5">50 %</option><option value="0.75">75 %</option><option value="1" selected>100 %</option></select></label>
       <label for="cortes">¿Con qué frecuencia se corta la luz?<select id="cortes"><option value="0">Casi nunca</option><option value="1" selected>Algunas veces al año</option><option value="2">Todos los meses o con temporales</option></select></label>
     </form>
@@ -1335,7 +1340,16 @@ html,body{overflow-x:clip}
     let te=0;const warn=()=>{if(++te===3){const d=document.createElement('div');d.style.cssText='position:absolute;inset:auto 10px 30px 10px;z-index:1000;background:var(--bg);color:var(--ink);border-left:4px solid var(--accent);padding:10px 12px;font-size:12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15)';d.textContent='En esta vista previa el mapa satelital está bloqueado; en el sitio publicado se verá completo. Mientras, pega tus coordenadas de Google Maps o elige tu comuna.';$('map').appendChild(d);}};sat.on('tileerror',warn);osm.on('tileerror',warn);
     map.on('click',e=>place(e.latlng.lat,e.latlng.lng));
   }catch(e){$('map').style.display='none';}
-  $('coordbtn').onclick=()=>{const m=$('coord').value.match(/(-?\d+(?:\.\d+)?)\s*[,; ]\s*(-?\d+(?:\.\d+)?)/);if(!m){$('msrc').textContent='Formato no reconocido. Ejemplo: -32.4100, -71.4000';return;}let a=+m[1],b=+m[2];if(a<-60||a>-15||b<-80||b>-60){$('msrc').textContent='Las coordenadas no están en Chile continental.';return;}if(map)place(a,b,16);else apply(a,b);};
+  async function buscar(){const q=$('coord').value.trim();if(!q){$('msrc').textContent='Escribe tu dirección o sector.';return;}
+    const m=q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[,; ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if(m){let a=+m[1],b=+m[2];if(a<-60||a>-15||b<-80||b>-60){$('msrc').textContent='Esas coordenadas no están en Chile continental.';return;}if(map)place(a,b,17);else apply(a,b);return;}
+    $('msrc').textContent='Buscando "'+q+'"...';
+    try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=cl&accept-language=es&q='+encodeURIComponent(q));const j=await r.json();
+      if(!j.length){$('msrc').textContent='No encontramos esa dirección. Prueba con el sector y la comuna (ej: Pullally, Papudo) o usa tu ubicación.';return;}
+      const a=+j[0].lat,b=+j[0].lon;if(map)place(a,b,17);else apply(a,b);
+      $('msrc').textContent+=' Ajusta el punto haciendo clic sobre tu techo.';}
+    catch(e){$('msrc').textContent='No pudimos buscar la dirección. Usa tu ubicación o haz clic en el mapa.';}}
+  $('coordbtn').onclick=buscar;$('coord').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscar();}});
   $('gpsbtn').onclick=()=>{if(!navigator.geolocation){$('msrc').textContent='Tu navegador no entrega la ubicación. Usa el mapa o pega coordenadas.';return;}$('msrc').textContent='Buscando tu ubicación... acepta el permiso que pide tu navegador.';navigator.geolocation.getCurrentPosition(p=>{map?place(p.coords.latitude,p.coords.longitude,17):apply(p.coords.latitude,p.coords.longitude)},()=>{$('msrc').textContent='No se pudo obtener la ubicación (en esta vista previa el navegador la bloquea; en el sitio publicado pedirá permiso). Usa el mapa o pega coordenadas.';},{enableHighAccuracy:true,timeout:10000});};
 })();
 </script>
