@@ -957,6 +957,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 #opinion .op legend+*{clear:both}
 #opinion .chips{align-items:flex-start;align-content:flex-start}
 #opinion .op fieldset{align-content:start}
+.calcbtn.inline{width:auto;display:inline-block;text-decoration:none;color:#1F2D35;font-weight:800;padding:16px 26px;font-size:17px}
+a.calcbtn{color:#1F2D35}
+#opinion .op .send.calcbtn{border-radius:14px}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -975,7 +978,7 @@ html,body{overflow-x:clip}
       <div class="eyebrow">Proyectos netbilling · Ley 21.118</div>
       <h1>Energía propia, respaldo garantizado</h1>
       <p>Sistemas solares para hogares en todo Chile. Genera tu energía, inyecta el excedente a la red y mantén tu casa encendida cuando se corta la luz.</p>
-      <a class="btn" href="#contacto">Cotiza tu sistema</a>
+      <a class="btn calcbtn inline ready" href="#contacto"><span class="cbic">☀️</span> Cotiza tu sistema <span class="cbar">→</span></a>
     </div>
     <div class="specs">
       <div><b>&lt; 4 ms</b><span>conmutación ante un corte</span></div>
@@ -1105,7 +1108,7 @@ html,body{overflow-x:clip}
     <div class="row"><span>HSP de junio</span><b id="rhsp">–</b></div>
     <div class="row"><span>Plan sugerido</span><b id="rplan">–</b></div>
     <p class="note" style="margin:6px 0 0">Potencia FV (kWp) = energía diaria de diseño ÷ HSP de junio. La energía de diseño es el consumo diario × factor de seguridad 1,25, que absorbe las pérdidas del sistema. HSP = radiación diaria sobre el panel inclinado en junio, el mes con menos sol (kWh/m² ÷ 1 kW/m²). Así el sistema cubre el peor mes; en primavera y verano el excedente se inyecta a la red (netbilling). Las HSP por comuna corresponden a la cabecera comunal, con panel inclinado a la latitud y orientado al norte (año típico 2004–2017). El proyecto final se confirma en la visita técnica.</p>
-    <a class="btn" href="#contacto" style="justify-self:start;margin-top:8px">Solicitar evaluación</a>
+    <a class="btn calcbtn inline" id="solbtn" href="#contacto" style="justify-self:start;margin-top:8px"><span class="cbic">📋</span> Solicitar evaluación <span class="cbar">→</span></a>
   </div>
 </div></section>
 
@@ -1167,7 +1170,7 @@ html,body{overflow-x:clip}
       <fieldset><legend>Vives en</legend><div class="chips"><label><input type="radio" name="vivienda" value="casa_urbana"><span>Casa en ciudad</span></label><label><input type="radio" name="vivienda" value="parcela"><span>Parcela</span></label><label><input type="radio" name="vivienda" value="departamento"><span>Departamento</span></label><label><input type="radio" name="vivienda" value="otra"><span>Otra</span></label></div></fieldset>
     </div>
     <fieldset><legend>¿Qué cambiarías o mejorarías? (opcional)</legend><textarea id="opcom" maxlength="500" placeholder="Escribe aquí tu comentario"></textarea></fieldset>
-    <button class="btn send" type="submit">Enviar mi opinión 🙌</button>
+    <button class="btn calcbtn send" id="opsend" type="submit"><span class="cbic">💬</span> Enviar mi opinión <span class="cbar">→</span></button>
     <div class="msg" id="opmsg" role="status"></div>
   </form>
 </div></section>
@@ -1187,7 +1190,7 @@ html,body{overflow-x:clip}
     <label for="fono">Teléfono<input id="fono" type="tel" required pattern="\+?[0-9 ]{8,15}" maxlength="16" autocomplete="tel"></label>
     <input type="text" id="web" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
     <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:12px"><input type="checkbox" id="consent" required style="margin-top:3px"> Acepto que SOLARNIK (IN-ELEC SpA) use mis datos solo para contactarme por esta solicitud, según la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</label>
-    <button class="btn" type="submit">Enviar solicitud</button>
+    <button class="btn calcbtn" id="leadsend" type="submit"><span class="cbic">📩</span> Enviar solicitud <span class="cbar">→</span></button>
     <div class="ok" id="okmsg" role="status"></div>
   </form>
 </div></section>
@@ -1397,6 +1400,17 @@ html,body{overflow-x:clip}
 <script>
 (function(){const sc=document.querySelector('.tscroll'),h=document.querySelector('.thint');if(!sc)return;
  const up=()=>{const end=sc.scrollTop+sc.clientHeight>=sc.scrollHeight-8;sc.classList.toggle('end',end);h.classList.toggle('hide',end);};sc.addEventListener('scroll',up,{passive:true});addEventListener('resize',up);setTimeout(up,300);})();
+</script>
+
+<script>
+(function(){
+  const of=document.getElementById('opform'),ob=document.getElementById('opsend');
+  if(of&&ob){const chk=()=>{const ok=['logro','visita','nota'].every(n=>of.querySelector('input[name="'+n+'"]:checked'));ob.classList.toggle('ready',ok);ob.classList.toggle('idle',!ok);};of.addEventListener('change',chk);of.addEventListener('reset',()=>setTimeout(chk,0));chk();}
+  const lf=document.getElementById('leadform'),lb=document.getElementById('leadsend');
+  if(lf&&lb){const chk=()=>{const ok=lf.checkValidity();lb.classList.toggle('ready',ok);lb.classList.toggle('idle',!ok);};lf.addEventListener('input',chk);lf.addEventListener('change',chk);chk();}
+  const sb=document.getElementById('solbtn');
+  if(sb){const t=()=>{const r=document.getElementById('rkwp');sb.classList.toggle('ready',!!r&&r.textContent.trim()!=='–');};new MutationObserver(t).observe(document.getElementById('rkwp'),{childList:true,characterData:true,subtree:true});t();}
+})();
 </script>
 </body>
 </html>
