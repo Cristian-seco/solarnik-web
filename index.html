@@ -1028,7 +1028,7 @@ html,body{overflow-x:clip}
       <div class="row"><span>Potencia simultánea</span><b id="ckw">–</b></div>
       <div class="row"><span>Inversor sugerido</span><b id="cinv">–</b></div>
       <div class="row"><span>Respaldo nocturno</span><b id="cbat">–</b></div>
-      <button class="btn" id="cuse" type="button" style="justify-self:start;border:0;cursor:pointer">Usar este consumo en la calculadora ↓</button>
+      <div class="cbwrap" style="margin-top:44px"><div class="cbub" id="cbub2" aria-hidden="true">👆 ¡Presiona aquí!</div><button class="btn calcbtn" id="cuse" type="button" style="font-size:16px;padding:15px"><span class="cbic">⚡</span> Usar este consumo en la calculadora <span class="cbar">↓</span></button></div>
       <p class="note" style="margin:0">Calculado para invierno: más horas de luz artificial, calefacción y agua caliente. Tu boleta y la visita técnica dan el valor definitivo.</p>
     </div>
   </div>
@@ -1239,12 +1239,12 @@ html,body{overflow-x:clip}
     $('cbat').textContent=bat.toFixed(1).replace('.',',')+' kWh · '+nb+' batería'+(nb>1?'s':'');
     const b=$('bolt');b.classList.remove('zap');void b.offsetWidth;b.classList.add('zap');
     if(window.__linked&&$('kwh')){$('kwh').value=cKwh;calc();}
-    {const cb=$('calcbtn'),bu=$('cbub');if(cb){const rdy=cKwh>0&&!window.__linked;cb.classList.toggle('ready',rdy);cb.classList.toggle('idle',!cKwh);bu.classList.toggle('show',rdy);bu.textContent=window.__linked?'':'👆 ¡Presiona aquí para calcular!';}}
+    {const cb=$('calcbtn'),bu=$('cbub'),cu=$('cuse'),bu2=$('cbub2');if(cb){const rdy=cKwh>0&&!window.__linked;[cb,cu].forEach(x=>{x.classList.toggle('ready',rdy);x.classList.toggle('idle',!cKwh);});bu.classList.toggle('show',rdy);bu2.classList.toggle('show',rdy);bu.textContent=window.__linked?'':'👆 ¡Presiona aquí para calcular!';}}
   }
   window.__linked=false;
-  const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('calcbtn').classList.remove('ready');$('cbub').classList.remove('show');$('simulador').scrollIntoView({behavior:'smooth'});};
+  const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('calcbtn').classList.remove('ready');$('cuse').classList.remove('ready');$('cbub').classList.remove('show');$('cbub2').classList.remove('show');$('simulador').scrollIntoView({behavior:'smooth'});};
   $('cuse').onclick=goCalc;$('calcbtn').onclick=goCalc;
-  $('kwh').addEventListener('input',()=>{if(window.__linked){window.__linked=false;$('linkmsg').textContent='Ingresaste un consumo a mano: los artefactos ya no lo cambian. Presiona Calcular para volver a enlazarlos.';if(cKwh){$('calcbtn').classList.add('ready');$('cbub').classList.add('show');}}});
+  $('kwh').addEventListener('input',()=>{if(window.__linked){window.__linked=false;$('linkmsg').textContent='Ingresaste un consumo a mano: los artefactos ya no lo cambian. Presiona Calcular para volver a enlazarlos.';if(cKwh){['calcbtn','cuse'].forEach(i=>$(i).classList.add('ready'));$('cbub').classList.add('show');$('cbub2').classList.add('show');}}});
   cargas();
   $('copybtn').addEventListener('click',()=>{
     const t=$('tel').textContent;
