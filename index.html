@@ -1091,7 +1091,7 @@ html,body{overflow-x:clip}
     navigator.clipboard?.writeText(t).then(()=>{$('copybtn').textContent='Copiado'}).catch(()=>{const r=document.createRange();r.selectNodeContents($('tel'));const s=getSelection();s.removeAllRanges();s.addRange(r)});
   });
   // Envío seguro: solo la clave pública (anon) de Supabase va en el navegador; la tabla tiene RLS que solo permite INSERT.
-  const SUPABASE_URL='__SUPABASE_URL__', SUPABASE_ANON='__SUPABASE_ANON_KEY__';
+  const SUPABASE_URL='https://soarlsfonkhgbwcwaruj.supabase.co', SUPABASE_ANON='sb_publishable_8tEL5QE-Ph_42xVj6vkDVA_nT9fbChU';
   let sending=false;
   $('leadform').addEventListener('submit',async e=>{e.preventDefault();if(sending)return;
     if($('web').value){$('okmsg').textContent='Solicitud recibida.';return;}
