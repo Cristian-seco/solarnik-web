@@ -936,6 +936,27 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .adv{border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 .adv summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:600}
 .maptools input{font-size:15px}
+
+/* encuesta en tarjeta clara */
+#opinion .ophead{text-align:center;max-width:640px;margin:0 auto 22px}
+#opinion .ophead h2{font-size:clamp(26px,4vw,36px);margin:10px 0 8px}
+#opinion .ophead p{color:var(--muted);margin:0}
+.opbadge{display:inline-block;background:rgba(60,198,218,.15);color:#3CC6DA;font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px}
+#opinion .op{--bg:#FFFFFF;--surface:#F3F8FA;--ink:#1F2D35;--muted:#5B6B74;--line:#D6E4E9;--cyan-deep:#0B7486;background:#FFFFFF;color:#1F2D35;max-width:760px;margin:0 auto;border-radius:22px;padding:28px;box-shadow:0 18px 40px rgba(0,0,0,.35);gap:22px}
+#opinion .op legend{color:#1F2D35;font-size:15px}
+#opinion .op fieldset{background:#F3F8FA;border-radius:14px;padding:14px 16px}
+#opinion .chips span{background:#fff;border-color:#D6E4E9;color:#1F2D35}
+#opinion .chips label:hover span{border-color:#13A8BE}
+#opinion .chips input:checked+span{background:#13A8BE;border-color:#13A8BE;color:#fff}
+#opinion .stars input:checked+span{background:#F39A1E;border-color:#F39A1E;color:#fff}
+#opinion .op textarea{background:#fff;color:#1F2D35;border-color:#D6E4E9}
+#opinion .op .msg{color:#0B7486}
+#opinion .op .send{justify-self:stretch;font-size:17px;padding:16px;border-radius:12px}
+#opinion .grid2 fieldset{margin:0}
+#opinion .op legend{float:left;width:100%;padding:0;margin:0 0 10px}
+#opinion .op legend+*{clear:both}
+#opinion .chips{align-items:flex-start;align-content:flex-start}
+#opinion .op fieldset{align-content:start}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -1134,19 +1155,19 @@ html,body{overflow-x:clip}
 
 
 <section id="opinion"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Prueba de la página</div><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">Danos tu opinión</h2></div><p style="color:var(--muted);max-width:52ch">Estamos probando esta herramienta. Toma 1 minuto y es anónimo: no pedimos nombre, teléfono ni correo.</p></div>
+  <div class="ophead"><span class="opbadge">💬 Oportunidad de mejora</span><h2>Ayúdanos a mejorar esta página</h2><p>Necesitamos tu apreciación sobre <b>cómo fue usar la página</b>: si fue fácil, qué te confundió y qué cambiarías. Es anónima y toma 1 minuto.</p></div>
   <form class="op" id="opform" novalidate>
     <fieldset><legend>1. ¿Pudiste calcular tu sistema sin ayuda?</legend><div class="chips"><label><input type="radio" name="logro" value="si" required><span>Sí, fácil</span></label><label><input type="radio" name="logro" value="con_dificultad"><span>Sí, con dificultad</span></label><label><input type="radio" name="logro" value="no"><span>No pude</span></label></div></fieldset>
     <fieldset><legend>2. ¿Qué parte te costó más entender?</legend><div class="chips"><label><input type="radio" name="confuso" value="ubicar"><span>Ubicar mi casa</span></label><label><input type="radio" name="confuso" value="artefactos"><span>Elegir artefactos</span></label><label><input type="radio" name="confuso" value="resultados"><span>Entender los resultados</span></label><label><input type="radio" name="confuso" value="ninguna"><span>Ninguna</span></label></div></fieldset>
     <fieldset><legend>3. Con este resultado, ¿pedirías una visita técnica?</legend><div class="chips"><label><input type="radio" name="visita" value="si" required><span>Sí</span></label><label><input type="radio" name="visita" value="tal_vez"><span>Tal vez</span></label><label><input type="radio" name="visita" value="no"><span>No</span></label></div></fieldset>
     <fieldset><legend>4. ¿Qué te frenaría a instalar un sistema solar?</legend><div class="chips"><label><input type="radio" name="freno" value="precio"><span>El precio</span></label><label><input type="radio" name="freno" value="confianza"><span>No confío aún</span></label><label><input type="radio" name="freno" value="tramite"><span>El trámite con CGE</span></label><label><input type="radio" name="freno" value="no_necesito"><span>No lo necesito</span></label><label><input type="radio" name="freno" value="otro"><span>Otro</span></label></div></fieldset>
-    <fieldset><legend>5. Nota a la página (1 a 7)</legend><div class="chips stars"><label><input type="radio" name="nota" value="1" required><span>1</span></label><label><input type="radio" name="nota" value="2"><span>2</span></label><label><input type="radio" name="nota" value="3"><span>3</span></label><label><input type="radio" name="nota" value="4"><span>4</span></label><label><input type="radio" name="nota" value="5"><span>5</span></label><label><input type="radio" name="nota" value="6"><span>6</span></label><label><input type="radio" name="nota" value="7"><span>7</span></label></div></fieldset>
+    <fieldset><legend>5. ¿Qué nota le pones a la página? (1 a 7)</legend><div class="chips stars"><label><input type="radio" name="nota" value="1" required><span>1</span></label><label><input type="radio" name="nota" value="2"><span>2</span></label><label><input type="radio" name="nota" value="3"><span>3</span></label><label><input type="radio" name="nota" value="4"><span>4</span></label><label><input type="radio" name="nota" value="5"><span>5</span></label><label><input type="radio" name="nota" value="6"><span>6</span></label><label><input type="radio" name="nota" value="7"><span>7</span></label></div></fieldset>
     <div class="grid2">
       <fieldset><legend>Tu edad</legend><div class="chips"><label><input type="radio" name="edad" value="18-29"><span>18–29</span></label><label><input type="radio" name="edad" value="30-49"><span>30–49</span></label><label><input type="radio" name="edad" value="50-69"><span>50–69</span></label><label><input type="radio" name="edad" value="70+"><span>70 o más</span></label></div></fieldset>
       <fieldset><legend>Vives en</legend><div class="chips"><label><input type="radio" name="vivienda" value="casa_urbana"><span>Casa en ciudad</span></label><label><input type="radio" name="vivienda" value="parcela"><span>Parcela</span></label><label><input type="radio" name="vivienda" value="departamento"><span>Departamento</span></label><label><input type="radio" name="vivienda" value="otra"><span>Otra</span></label></div></fieldset>
     </div>
-    <fieldset><legend>¿Algo que mejorarías? (opcional)</legend><textarea id="opcom" maxlength="500" placeholder="Escribe aquí tu comentario"></textarea></fieldset>
-    <button class="btn send" type="submit">Enviar opinión</button>
+    <fieldset><legend>¿Qué cambiarías o mejorarías? (opcional)</legend><textarea id="opcom" maxlength="500" placeholder="Escribe aquí tu comentario"></textarea></fieldset>
+    <button class="btn send" type="submit">Enviar mi opinión 🙌</button>
     <div class="msg" id="opmsg" role="status"></div>
   </form>
 </div></section>
