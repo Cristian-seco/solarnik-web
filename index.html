@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -851,6 +851,27 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .dash .foot{font-size:11px;color:var(--muted);margin-top:12px}
 @media (max-width:900px){.charts{grid-template-columns:1fr 1fr}.charts .bars{grid-column:1/-1}}
 @media (max-width:520px){.charts{grid-template-columns:1fr}}
+
+/* artefactos v3: tarjeta con ilustración + medidor de consumo */
+.tiles{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.tile{grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;border-radius:18px;padding:14px;background:var(--surface);border:2px solid transparent}
+.tile .ai{width:44px;height:44px;grid-row:span 2;transition:filter .25s}
+.tile:not(.on) .ai{filter:grayscale(1) opacity(.55)}
+.tile span{font-weight:700;font-size:14px}
+.tile .ctr{grid-column:2;justify-content:flex-start;gap:8px;background:none;padding:0}
+.tile .ctr button{width:30px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.tile .ctr button:hover{border-color:var(--k);color:var(--k);background:var(--bg)}
+.tile .ctr b{font-size:16px;min-width:2ch}
+.tile.on{border-color:var(--k);background:var(--bg);box-shadow:0 8px 22px color-mix(in srgb,var(--k) 22%,transparent)}
+.tile.on .ctr b{color:var(--ink)}
+.tile.on .ctr,.tile .ctr{background:none!important}
+.tile .lvl{grid-column:1/-1;margin-top:6px}
+.tile .bar{height:7px;border-radius:4px;background:linear-gradient(90deg,#2FB36D 0%,#E9C23A 35%,#F39A1E 65%,#E5483A 100%);position:relative}
+.tile .bar i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--k);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.tile .tx{display:flex;justify-content:space-between;gap:8px;font-size:11px;margin-top:6px}
+.tile .tx em{font-style:normal;font-weight:700;color:var(--k)}
+.tile .tx small{color:var(--muted);font-size:11px;text-align:right}
+@media (max-width:480px){.tiles{grid-template-columns:1fr}.tile .ai{width:40px;height:40px}}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -952,7 +973,7 @@ html,body{overflow-x:clip}
 <section id="consumo" class="cargas"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Paso 1</div><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué hay en tu casa?</h2></div><p style="color:var(--muted);max-width:56ch">Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.</p></div>
   <div class="cg-grid">
-    <div class="tiles" id="tiles"></div>
+    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tiles" id="tiles"></div></div>
     <div class="cg-res" aria-live="polite">
       <span class="eyebrow">Consumo estimado · mes de invierno</span>
       <div class="gauge">
@@ -1125,26 +1146,18 @@ html,body{overflow-x:clip}
 
   // Cuadro de cargas, invierno: [nombre, P (W), T (h/día), cantidad inicial, motor, FU, FC]. E = P × T × FU × FC; FS se aplica en el dimensionamiento
   const A=[['Refrigerador',150,24,1,1,.35,.85],['Ampolletas LED',10,7,10,0,1,1],['Televisor',100,6,1,0,1,.9],['Computador',80,6,1,0,1,.8],['Router wifi',12,24,1,0,1,1],['Lavadora',500,1,1,1,.8,1],['Microondas',1100,.3,1,0,1,1],['Hervidor',2000,.25,1,0,1,1],['Plancha',1200,.25,0,0,.6,1],['Secador de pelo',1500,.2,0,0,1,1],['Horno eléctrico',2000,.5,0,0,1,.8],['Bomba de agua',750,1,0,1,1,1],['Termo eléctrico',1500,3,0,0,.85,1],['Estufa eléctrica',1500,6,0,0,.85,1]];
-  const IC=['<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 10h12M9 5v3M9 13v4"/>',
-'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
-'<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
-'<rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M2 19h20l-2-4H4z"/>',
-'<rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 13V7M17 13V7M7 16.5h.01M11 16.5h.01"/>',
-'<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M8 5.5h.01M11 5.5h5"/>',
-'<rect x="2" y="5" width="20" height="14" rx="2"/><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M18 9v.01M18 12v.01M18 15v.01"/>',
-'<path d="M6 20h12l-1-10H7zM8 10l1-5h6l1 5M17 12h2a2 2 0 0 1 0 4h-2"/>',
-'<path d="M3 17h17a1 1 0 0 0 1-1c0-4-3-8-8-8H8L3 17zM9 8V5h6"/>',
-'<path d="M3 8a5 5 0 0 1 5-5h9v10H8a5 5 0 0 1-5-5zM11 13l-2 8h4l1-8M20 6h2M20 10h2"/>',
-'<rect x="3" y="3" width="18" height="18" rx="2"/><rect x="6" y="9" width="12" height="9" rx="1"/><path d="M7 6h.01M11 6h.01M15 6h2"/>',
-'<circle cx="9" cy="13" r="6"/><circle cx="9" cy="13" r="2"/><path d="M15 13h6M18 10v6M9 3v4"/>',
-'<rect x="6" y="2" width="12" height="20" rx="6"/><path d="M12 9c-1.5 2-2 3-2 4a2 2 0 0 0 4 0c0-1-.5-2-2-4z"/>',
-'<path d="M5 4v16M9 4v16M13 4v16M17 4v16M3 20h18M3 8h18"/>'];
+  const IC=["<rect x=\"7\" y=\"2\" width=\"18\" height=\"28\" rx=\"3\" fill=\"var(--s)\"/><rect x=\"7\" y=\"2\" width=\"18\" height=\"10\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"10\" y=\"5\" width=\"2\" height=\"4\" rx=\"1\" fill=\"#fff\"/><rect x=\"10\" y=\"15\" width=\"2\" height=\"7\" rx=\"1\" fill=\"var(--p)\"/>", "<path d=\"M16 4a8 8 0 0 0-4.6 14.5c.8.6 1.3 1.5 1.3 2.5h6.6c0-1 .5-1.9 1.3-2.5A8 8 0 0 0 16 4z\" fill=\"var(--p)\"/><rect x=\"12.5\" y=\"22.5\" width=\"7\" height=\"2.5\" rx=\"1\" fill=\"var(--s)\"/><rect x=\"13.5\" y=\"26\" width=\"5\" height=\"2.5\" rx=\"1.2\" fill=\"var(--s)\"/><path d=\"M13.5 10.5a3 3 0 0 1 2.5-2\" stroke=\"#fff\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/>", "<rect x=\"3\" y=\"6\" width=\"26\" height=\"17\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"5.5\" y=\"8.5\" width=\"21\" height=\"12\" rx=\"1.5\" fill=\"var(--s)\"/><path d=\"M11 28h10M16 23v5\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/>", "<rect x=\"6\" y=\"6\" width=\"20\" height=\"14\" rx=\"2\" fill=\"var(--p)\"/><rect x=\"8.5\" y=\"8.5\" width=\"15\" height=\"9\" rx=\"1\" fill=\"var(--s)\"/><path d=\"M3 22h26l-2 4H5z\" fill=\"var(--p)\"/>", "<rect x=\"4\" y=\"16\" width=\"24\" height=\"10\" rx=\"3\" fill=\"var(--p)\"/><circle cx=\"9\" cy=\"21\" r=\"1.4\" fill=\"var(--s)\"/><circle cx=\"13\" cy=\"21\" r=\"1.4\" fill=\"var(--s)\"/><path d=\"M9 16V7M23 16V7\" stroke=\"var(--p)\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M12 9a6 6 0 0 1 8 0M14 12a3 3 0 0 1 4 0\" stroke=\"var(--s)\" stroke-width=\"1.8\" fill=\"none\" stroke-linecap=\"round\"/>", "<rect x=\"5\" y=\"3\" width=\"22\" height=\"26\" rx=\"3\" fill=\"var(--s)\"/><rect x=\"5\" y=\"3\" width=\"22\" height=\"6\" rx=\"3\" fill=\"var(--p)\"/><circle cx=\"16\" cy=\"18.5\" r=\"7\" fill=\"var(--p)\"/><path d=\"M10.5 19.5c2-1.6 3.6 1.4 5.5 0s3.6-1.5 5.5 0v1a5.5 5.5 0 0 1-11 0z\" fill=\"var(--s)\"/><circle cx=\"9\" cy=\"6\" r=\"1.2\" fill=\"#fff\"/>", "<rect x=\"3\" y=\"7\" width=\"26\" height=\"18\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"6\" y=\"10\" width=\"15\" height=\"12\" rx=\"1.5\" fill=\"var(--s)\"/><circle cx=\"25\" cy=\"12\" r=\"1.3\" fill=\"var(--s)\"/><circle cx=\"25\" cy=\"16\" r=\"1.3\" fill=\"var(--s)\"/><rect x=\"23.7\" y=\"19\" width=\"2.6\" height=\"3\" rx=\"1\" fill=\"var(--s)\"/>", "<path d=\"M9 12h13l2 15H7z\" fill=\"var(--p)\"/><path d=\"M11 12l1.5-5h6l1.5 5\" fill=\"var(--s)\"/><path d=\"M24 15h2a3 3 0 0 1 0 6h-2.4\" stroke=\"var(--p)\" stroke-width=\"2.4\" fill=\"none\"/><path d=\"M13 4c0-1.2 1-1.2 1-2.4M17 4c0-1.2 1-1.2 1-2.4\" stroke=\"var(--s)\" stroke-width=\"1.6\" stroke-linecap=\"round\"/>", "<path d=\"M4 23h22a2 2 0 0 0 2-2c0-6-4-11-11-11H11L4 23z\" fill=\"var(--p)\"/><path d=\"M11 10V7h9\" stroke=\"var(--p)\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M9 19h15\" stroke=\"var(--s)\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M8 27h3M14 27h3M20 27h3\" stroke=\"var(--s)\" stroke-width=\"1.8\" stroke-linecap=\"round\"/>", "<path d=\"M4 11a7 7 0 0 1 7-7h12v13H11a7 7 0 0 1-7-6z\" fill=\"var(--p)\"/><circle cx=\"11\" cy=\"10.5\" r=\"3\" fill=\"var(--s)\"/><path d=\"M14 17l-2.5 11h5L18 17\" fill=\"var(--p)\"/><path d=\"M26 7h3M26 11h3M26 15h3\" stroke=\"var(--s)\" stroke-width=\"1.8\" stroke-linecap=\"round\"/>", "<rect x=\"4\" y=\"3\" width=\"24\" height=\"26\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"7\" y=\"11\" width=\"18\" height=\"14\" rx=\"2\" fill=\"var(--s)\"/><circle cx=\"9\" cy=\"7\" r=\"1.4\" fill=\"var(--s)\"/><circle cx=\"14\" cy=\"7\" r=\"1.4\" fill=\"var(--s)\"/><rect x=\"18\" y=\"6\" width=\"7\" height=\"2\" rx=\"1\" fill=\"var(--s)\"/><path d=\"M11 20c1.5-1 3 1 4.5 0s3-1 4.5 0\" stroke=\"var(--p)\" stroke-width=\"1.6\" fill=\"none\"/>", "<circle cx=\"12\" cy=\"17\" r=\"8\" fill=\"var(--p)\"/><circle cx=\"12\" cy=\"17\" r=\"3\" fill=\"var(--s)\"/><path d=\"M20 17h8M28 13v8\" stroke=\"var(--p)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M12 9V4M9 4h6\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M24 25c-1.3 1.7-2 2.6-2 3.4a2 2 0 0 0 4 0c0-.8-.7-1.7-2-3.4z\" fill=\"var(--s)\"/>", "<rect x=\"8\" y=\"2\" width=\"16\" height=\"24\" rx=\"8\" fill=\"var(--s)\"/><rect x=\"8\" y=\"2\" width=\"16\" height=\"9\" rx=\"8\" fill=\"var(--p)\"/><path d=\"M16 14c-2 2.6-3 4-3 5.4a3 3 0 0 0 6 0c0-1.4-1-2.8-3-5.4z\" fill=\"var(--p)\"/><path d=\"M12 26v4M20 26v4\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/>", "<rect x=\"4\" y=\"10\" width=\"24\" height=\"16\" rx=\"3\" fill=\"var(--p)\"/><path d=\"M9 13v10M13.7 13v10M18.3 13v10M23 13v10\" stroke=\"var(--s)\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M10 7c-1-1.5 1-2.5 0-4M16 7c-1-1.5 1-2.5 0-4M22 7c-1-1.5 1-2.5 0-4\" stroke=\"var(--p)\" stroke-width=\"1.8\" fill=\"none\" stroke-linecap=\"round\"/>"];
+  const ICC=["#13A8BE", "#E0A21B", "#7C8C95", "#7C8C95", "#7C8C95", "#2F7DC4", "#E5633A", "#E5633A", "#9B6BD3", "#9B6BD3", "#E5633A", "#2F7DC4", "#E5483A", "#E5483A"],ICT=["#BFE9F0", "#FBE2A6", "#C9D3D8", "#C9D3D8", "#C9D3D8", "#C9E3F6", "#F7C6B4", "#F7C6B4", "#DCCBF2", "#DCCBF2", "#F7C6B4", "#C9E3F6", "#F8C3BE", "#F8C3BE"];
   const q=A.map(a=>a[3]);
   const tiles=$('tiles');
-  A.forEach((a,i)=>{const d=document.createElement('div');d.className='tile';d.innerHTML='<div class="ic"><svg viewBox="0 0 24 24">'+(IC[i]||'')+'</svg></div><span>'+a[0]+'</span><div class="ctr"><button type="button" aria-label="Quitar '+a[0]+'">−</button><b>'+q[i]+'</b><button type="button" aria-label="Agregar '+a[0]+'">+</button></div>';
+  const LV=k=>k<15?['bajo','#2FB36D']:k<40?['medio','#D9A514']:k<100?['alto','#F39A1E']:['crítico','#E5483A'];
+  const LP=k=>{const T=[0,15,40,100,300];for(let x=0;x<4;x++)if(k<T[x+1]||x===3)return Math.min(97,Math.max(3,25*x+25*Math.min(1,(k-T[x])/(T[x+1]-T[x]))));};
+  A.forEach((a,i)=>{const d=document.createElement('div');d.className='tile';const k=a[1]*a[2]*a[5]*a[6]*30/1000,[ln,lc]=LV(k);d.style.setProperty('--k',lc);
+    d.innerHTML='<svg class="ai" viewBox="0 0 32 32" aria-hidden="true" style="--p:'+ICC[i]+';--s:'+ICT[i]+'">'+(IC[i]||'')+'</svg><span>'+a[0]+'</span><div class="ctr"><button type="button" aria-label="Quitar '+a[0]+'">−</button><b>'+q[i]+'</b><button type="button" aria-label="Agregar '+a[0]+'">+</button></div><div class="lvl"><div class="bar"><i style="left:'+LP(k)+'%"></i></div><div class="tx"><em>Consumo '+ln+'</em><small></small></div></div>';
+    const tot=()=>{d.querySelector('.tx small').textContent=(k<10?k.toFixed(1).replace('.',','):Math.round(k))+' kWh/mes c/u'+(q[i]>1?' · '+Math.round(k*q[i])+' total':'');};
     const [m,p]=d.querySelectorAll('button');
-    const upd=dv=>{q[i]=Math.max(0,Math.min(40,q[i]+dv));d.querySelector('b').textContent=q[i];d.classList.toggle('on',q[i]>0);d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop');cargas();};
-    m.onclick=()=>upd(-1);p.onclick=()=>upd(1);d.classList.toggle('on',q[i]>0);tiles.appendChild(d);});
+    const upd=dv=>{q[i]=Math.max(0,Math.min(40,q[i]+dv));d.querySelector('b').textContent=q[i];tot();d.classList.toggle('on',q[i]>0);d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop');cargas();};
+    m.onclick=()=>upd(-1);p.onclick=()=>upd(1);tot();d.classList.toggle('on',q[i]>0);tiles.appendChild(d);});
   let shown=0,anim;
   function count(to){cancelAnimationFrame(anim);const from=shown,t0=performance.now();const st=t=>{const k=Math.min(1,(t-t0)/600);shown=from+(to-from)*(1-Math.pow(1-k,3));$('ckwh').textContent=Math.round(shown);if(k<1)anim=requestAnimationFrame(st)};anim=requestAnimationFrame(st);}
   let cKwh=0;
