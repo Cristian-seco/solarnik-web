@@ -902,6 +902,20 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .op .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media (max-width:640px){.op .grid2{grid-template-columns:1fr}}
 .seclogo{display:block;height:54px;width:auto;margin:2px 0 6px}
+
+.cbwrap{position:relative;margin-top:52px}
+.calcbtn{width:100%;border:0;cursor:pointer;font-size:18px;padding:18px;border-radius:14px;background:linear-gradient(135deg,#F5A73A,#F39A1E 55%,#E5873A);box-shadow:0 6px 0 #B86A10,0 10px 24px rgba(243,154,30,.35);transition:transform .1s,box-shadow .1s;position:relative}
+.calcbtn:active{transform:translateY(5px);box-shadow:0 1px 0 #B86A10,0 4px 10px rgba(243,154,30,.3)}
+.calcbtn .cbar{display:inline-block;transition:transform .2s}
+.calcbtn:hover .cbar{transform:translateX(5px)}
+.calcbtn.ready{animation:cpulse 1.6s ease-out infinite}
+@keyframes cpulse{0%{box-shadow:0 6px 0 #B86A10,0 0 0 0 rgba(243,154,30,.65)}70%{box-shadow:0 6px 0 #B86A10,0 0 0 18px rgba(243,154,30,0)}100%{box-shadow:0 6px 0 #B86A10,0 0 0 0 rgba(243,154,30,0)}}
+.calcbtn.idle{filter:grayscale(.6) brightness(.8);box-shadow:0 6px 0 #6b6b6b}
+.cbub{position:absolute;left:50%;bottom:calc(100% + 12px);transform:translateX(-50%);background:#3CC6DA;color:#06222a;font-weight:800;font-size:14px;padding:8px 14px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .3s}
+.cbub::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#3CC6DA}
+.cbub.show{opacity:1;animation:cbounce 1.2s ease-in-out infinite}
+@keyframes cbounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-7px)}}
+@media (prefers-reduced-motion:reduce){.calcbtn.ready,.cbub.show{animation:none}}
 html,body{overflow-x:clip}
 #map{height:340px;border-radius:14px;border:1px solid var(--line);z-index:0}
 .maptools{display:flex;gap:8px;flex-wrap:wrap}
@@ -1003,7 +1017,7 @@ html,body{overflow-x:clip}
 <section id="consumo" class="cargas"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Paso 1</div><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué hay en tu casa?</h2></div><p style="color:var(--muted);max-width:56ch">Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.</p></div>
   <div class="cg-grid">
-    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tiles" id="tiles"></div><button class="btn" id="calcbtn" type="button" style="margin-top:16px;border:0;cursor:pointer;width:100%;font-size:17px;padding:16px">Calcular mi sistema →</button><p class="note" id="linkmsg" style="margin:8px 0 0"></p></div>
+    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tiles" id="tiles"></div><div class="cbwrap"><div class="cbub" id="cbub" aria-hidden="true">👆 ¡Presiona aquí para calcular!</div><button class="btn calcbtn" id="calcbtn" type="button"><span class="cbic">⚡</span> Calcular mi sistema <span class="cbar">→</span></button></div><p class="note" id="linkmsg" style="margin:8px 0 0"></p></div>
     <div class="cg-res" aria-live="polite">
       <span class="eyebrow">Consumo estimado · mes de invierno</span>
       <div class="gauge">
@@ -1225,11 +1239,12 @@ html,body{overflow-x:clip}
     $('cbat').textContent=bat.toFixed(1).replace('.',',')+' kWh · '+nb+' batería'+(nb>1?'s':'');
     const b=$('bolt');b.classList.remove('zap');void b.offsetWidth;b.classList.add('zap');
     if(window.__linked&&$('kwh')){$('kwh').value=cKwh;calc();}
+    {const cb=$('calcbtn'),bu=$('cbub');if(cb){const rdy=cKwh>0&&!window.__linked;cb.classList.toggle('ready',rdy);cb.classList.toggle('idle',!cKwh);bu.classList.toggle('show',rdy);bu.textContent=window.__linked?'':'👆 ¡Presiona aquí para calcular!';}}
   }
   window.__linked=false;
-  const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('simulador').scrollIntoView({behavior:'smooth'});};
+  const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('calcbtn').classList.remove('ready');$('cbub').classList.remove('show');$('simulador').scrollIntoView({behavior:'smooth'});};
   $('cuse').onclick=goCalc;$('calcbtn').onclick=goCalc;
-  $('kwh').addEventListener('input',()=>{if(window.__linked){window.__linked=false;$('linkmsg').textContent='Ingresaste un consumo a mano: los artefactos ya no lo cambian. Presiona Calcular para volver a enlazarlos.';}});
+  $('kwh').addEventListener('input',()=>{if(window.__linked){window.__linked=false;$('linkmsg').textContent='Ingresaste un consumo a mano: los artefactos ya no lo cambian. Presiona Calcular para volver a enlazarlos.';if(cKwh){$('calcbtn').classList.add('ready');$('cbub').classList.add('show');}}});
   cargas();
   $('copybtn').addEventListener('click',()=>{
     const t=$('tel').textContent;
