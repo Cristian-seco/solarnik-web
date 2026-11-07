@@ -67,3 +67,11 @@ revoke all on public.leads from anon, authenticated;
 grant insert (nombre, telefono, region, comuna, techo, consentimiento, kwh_mes, hsp_junio,
               interes, propiedad, boleta, cortes, origen)
   on public.leads to anon;
+
+-- Aviso por Telegram de cada nuevo lead (trigger en el servidor; el token y el chat_id viven cifrados en Supabase Vault,
+-- secretos 'telegram_bot_token' y 'telegram_chat_id'; nunca en el frontend). Requiere la extensión pg_net.
+-- create extension if not exists pg_net;
+-- select vault.create_secret('<TOKEN>','telegram_bot_token');  select vault.create_secret('<CHAT_ID>','telegram_chat_id');
+-- La función public.notificar_lead_telegram() (security definer, sin permisos para anon/authenticated) arma el mensaje
+-- y llama a net.http_post hacia api.telegram.org/sendMessage; el trigger leads_aviso_telegram corre AFTER INSERT.
+-- Si Telegram falla, el lead se guarda igual (exception when others then return new).
