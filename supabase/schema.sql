@@ -75,3 +75,7 @@ grant insert (nombre, telefono, region, comuna, techo, consentimiento, kwh_mes, 
 -- La función public.notificar_lead_telegram() (security definer, sin permisos para anon/authenticated) arma el mensaje
 -- y llama a net.http_post hacia api.telegram.org/sendMessage; el trigger leads_aviso_telegram corre AFTER INSERT.
 -- Si Telegram falla, el lead se guarda igual (exception when others then return new).
+
+-- ¿Tiene la boleta a mano? (asistente), solo INSERT para el público
+alter table public.leads add column if not exists tiene_boleta boolean;
+grant insert (tiene_boleta) on public.leads to anon;

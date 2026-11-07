@@ -99,7 +99,10 @@ async function run(){
   await say('¿Y en qué comuna?');
   d.comuna=await ask('Ej: La Ligua','text',v=>v.length<2?'Escribe el nombre de tu comuna':v.length>60?'Máximo 60 caracteres':!/^[\p{L} .'’-]+$/u.test(v)?'Usa solo letras':'');prog(4);
   await say('¿Cuánto pagas aproximadamente de luz al mes?');
-  d.boleta=await choose([['<40','Menos de $40.000'],['40-80','$40.000 – $80.000'],['80-150','$80.000 – $150.000'],['>150','Más de $150.000'],['nose','No lo sé']]);prog(5);
+  d.boleta=await choose([['<40','Menos de $40.000'],['40-80','$40.000 – $80.000'],['80-150','$80.000 – $150.000'],['>150','Más de $150.000'],['nose','No lo sé']]);
+  await say('¿Tienes a mano tu última boleta de luz?');
+  d.tiene_boleta=await choose([[true,'🧾 Sí, la tengo'],[false,'Ahora no']]);prog(5);
+  await say(d.tiene_boleta?'Perfecto. Tenla a mano para la visita: su gráfico de los últimos 13 meses nos da tu consumo real, y con eso calculamos tu retorno exacto.':'No hay problema. Para la visita, búscala o descárgala desde la web de tu distribuidora: su gráfico de 13 meses nos da tu consumo real.');
   await say('¿Con qué frecuencia te quedas sin luz?');
   d.cortes=await choose([['frecuentes','Varias veces al año'],['a_veces','A veces'],['casi_nunca','Casi nunca']]);prog(6);
   await say('Último paso. ¿Cuál es tu nombre?');
@@ -119,7 +122,7 @@ function phoneStep(){return new Promise(res=>{
     if(!document.getElementById('cs').checked){er.textContent='Debes aceptar el uso de tus datos para que te contactemos';return}
     if(document.getElementById('hp').value||Date.now()-T0<6000){er.textContent='No se pudo enviar. Intenta nuevamente.';return}
     d.telefono=v;ok.disabled=true;ok.textContent='…';
-    const body={nombre:d.nombre,telefono:d.telefono,region:d.region,comuna:d.comuna,consentimiento:true,interes:d.interes,propiedad:d.propiedad,boleta:d.boleta,cortes:d.cortes,origen:d.origen};
+    const body={nombre:d.nombre,telefono:d.telefono,region:d.region,comuna:d.comuna,consentimiento:true,interes:d.interes,propiedad:d.propiedad,boleta:d.boleta,tiene_boleta:d.tiene_boleta,cortes:d.cortes,origen:d.origen};
     try{
       const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
       if(!r.ok)throw new Error(r.status);
