@@ -1356,6 +1356,25 @@ html,body{overflow-x:clip}
       $('hsrc').textContent='Comuna: '+H[bi[0]][1][bi[1]][0]+' (según límite comunal). HSP calculada con las cabeceras más cercanas: '+k3.map(([d,i,j])=>H[i][1][j][0]+' a '+Math.round(d)+' km').join(', ')+'.';
     })();if(window.__hspPoint)h=window.__hspPoint;const p=$('prod');p.value=h.toFixed(1);p.dispatchEvent(new Event('input',{bubbles:true}));
     $('msrc').textContent='Punto '+lat.toFixed(4)+', '+lon.toFixed(4)+': HSP de junio '+h.toFixed(2).replace('.',',')+' h/día (Explorador Solar, panel inclinado a la latitud, orientado al norte).';
+    live(lat,lon);
+  }
+  // Consulta en vivo del punto exacto: pasa por la función de servidor "hsp" (la API key del Ministerio vive solo allí).
+  // Si no responde, la calculadora sigue con el valor de la tabla.
+  let liveSeq=0;
+  function live(lat,lon){
+    const n=++liveSeq;
+    setTimeout(async()=>{
+      if(n!==liveSeq)return;
+      try{
+        const r=await fetch('https://soarlsfonkhgbwcwaruj.supabase.co/functions/v1/hsp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:+lat.toFixed(4),lon:+lon.toFixed(4)}),signal:AbortSignal.timeout(30000)});
+        if(!r.ok||n!==liveSeq)return;
+        const j=await r.json();
+        if(!(j.hsp_junio>0&&j.hsp_junio<12)||!Array.isArray(j.perfil)||j.perfil.length!==12||!j.perfil.every(v=>typeof v==='number'&&v>0&&v<12))return;
+        window.__hspPoint=j.hsp_junio;window.__prof=j.perfil;
+        const p=$('prod');p.value=j.hsp_junio.toFixed(1);p.dispatchEvent(new Event('input',{bubbles:true}));
+        $('msrc').textContent='Punto '+lat.toFixed(4)+', '+lon.toFixed(4)+': HSP de junio '+j.hsp_junio.toFixed(2).replace('.',',')+' h/día. Dato del punto exacto, consultado al Explorador Solar del Ministerio de Energía (panel inclinado a la latitud, orientado al norte).';
+      }catch(e){}
+    },800);
   }
   let map,mk;
   function place(lat,lon,zoom){if(!map)return;const ic=L.divIcon({className:'',html:'<div class="pin"></div>',iconSize:[22,22],iconAnchor:[11,22]});if(mk)mk.setLatLng([lat,lon]);else mk=L.marker([lat,lon],{icon:ic}).addTo(map);if(zoom)map.setView([lat,lon],zoom);apply(lat,lon);}

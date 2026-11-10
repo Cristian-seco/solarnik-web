@@ -27,3 +27,26 @@ Hay que volver a ejecutarla cada vez que se cambie la exposición de la tabla en
 **Pendientes antes del lanzamiento público:**
 - Limitar el envío masivo de formularios (spam): captcha (Cloudflare Turnstile) validado en una Edge Function.
 - La futura API key del Ministerio irá como secreto de una Edge Function, nunca en este repositorio.
+
+## Actualización · 10 de noviembre de 2026
+
+Se agregaron el latido diario (`public.ping()`), la tabla `hsp_cache` y la Edge Function `hsp`. Prueba como visitante anónimo desde el sitio:
+
+| # | Ataque | Resultado |
+|---|---|---|
+| 1 | Llamar a `ping()` | 200 `"ok"` (es lo esperado; no toca ninguna tabla) |
+| 2 | Leer `hsp_cache` | **401 denegado** |
+| 3 | Insertar en `hsp_cache` (envenenar la caché) | **401 denegado** |
+| 4 | Borrar `hsp_cache` | **401 denegado** |
+| 5 | Leer `leads` | **401 denegado** |
+| 6 | `hsp` con coordenadas fuera de Chile | 400 rechazado |
+| 7 | `hsp` con texto o SQL en lugar de números | 400 rechazado |
+| 8 | `hsp` con cuerpo de 5.000 caracteres | 413 rechazado |
+| 9 | `hsp` con método GET | 405 rechazado |
+
+Protecciones de la función `hsp`:
+- La API key del Ministerio se lee del secreto `MINENERGIA_API_KEY` (Supabase → Edge Functions → Secrets). No está en este repositorio ni en la página.
+- Solo acepta POST desde el sitio (`cristian-seco.github.io`, `solarnik.cl`), con latitud y longitud numéricas dentro de Chile.
+- Las consultas se guardan en `hsp_cache` (redondeo a 0,01°) y hay un tope de 300 consultas nuevas al Ministerio por día, para cuidar la cuota.
+- La verificación JWT heredada está desactivada porque la página usa la clave publicable; la función valida por su cuenta.
+- La cabecera `Origin` puede falsificarse fuera de un navegador: la defensa real contra el abuso es el tope diario y la caché.
