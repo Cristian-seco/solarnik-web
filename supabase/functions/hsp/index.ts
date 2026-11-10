@@ -14,7 +14,7 @@ function cors(origen: string | null) {
   return {
     "Access-Control-Allow-Origin": o,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "content-type, apikey, authorization, x-client-info",
+    "Access-Control-Allow-Headers": "content-type, apikey, authorization, x-client-info, x-region",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
     "Content-Type": "application/json; charset=utf-8",
@@ -95,8 +95,9 @@ Deno.serve(async (req) => {
     if (!r.ok) return out(502, { error: "explorador", estado: r.status });
     const j = await r.json();
     d = j?.data?.[0];
-  } catch {
-    return out(504, { error: "explorador_sin_respuesta" });
+  } catch (e) {
+    // Sin datos sensibles: solo el tipo de falla y la región donde corrió la función
+    return out(504, { error: "explorador_sin_respuesta", tipo: (e as Error)?.name ?? "", region: Deno.env.get("SB_REGION") ?? "" });
   }
   if (!Array.isArray(d) || d.length !== 12 || !d.every((v) => typeof v === "number" && v > 0 && v < 600)) {
     return out(422, { error: "sin_datos" }); // punto sin cobertura (mar, frontera) o respuesta inesperada
