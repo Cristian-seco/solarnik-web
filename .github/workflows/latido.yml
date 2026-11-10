@@ -1,0 +1,39 @@
+# Latido diario: mantiene activo el proyecto Supabase "solarnik" (plan gratuito).
+# Llama a public.ping(), una función de solo lectura que no toca ninguna tabla.
+# Usa únicamente la clave publicable (la misma que ya está en la página); no hay secretos aquí.
+name: Latido Supabase
+
+on:
+  schedule:
+    - cron: "17 9 * * *"    # 06:17 hora de Chile
+    - cron: "43 21 * * *"   # 18:43 hora de Chile (respaldo por si GitHub omite una ejecución)
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: latido
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Llamar a ping()
+        env:
+          SUPABASE_URL: https://soarlsfonkhgbwcwaruj.supabase.co
+          SUPABASE_KEY: sb_publishable_8tEL5QE-Ph_42xVj6vkDVA_nT9fbChU
+        run: |
+          set -euo pipefail
+          for intento in 1 2 3; do
+            codigo=$(curl -sS -m 30 -o respuesta.txt -w "%{http_code}" \
+              -X POST "$SUPABASE_URL/rest/v1/rpc/ping" \
+              -H "apikey: $SUPABASE_KEY" \
+              -H "Content-Type: application/json" -d '{}' || echo 000)
+            echo "Intento $intento: HTTP $codigo $(cat respuesta.txt 2>/dev/null || true)"
+            if [ "$codigo" = "200" ] && grep -q '"ok"' respuesta.txt; then exit 0; fi
+            sleep 20
+          done
+          echo "::error::Supabase no respondió al latido. Revisar si el proyecto está pausado: https://supabase.com/dashboard/project/soarlsfonkhgbwcwaruj"
+          exit 1
