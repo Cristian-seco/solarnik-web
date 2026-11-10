@@ -951,6 +951,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .eng-bob{animation:eng-bob .6s infinite}.eng-arm{transform-origin:62px 82px;animation:eng-tap .35s infinite}
 .eng-bulb,.eng-rays{animation:eng-glow .9s infinite}.eng-sun{transform-origin:40px 40px;animation:eng-spin 6s linear infinite}
 @media (prefers-reduced-motion:reduce){.eng-bob,.eng-arm,.eng-sun{animation:none}.eng-bulb,.eng-rays{animation:none;opacity:1}}
+.calcov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(8,18,22,.78);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.calcov[hidden]{display:none}
+.calcov .box{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:28px 34px 24px;text-align:center;width:min(92vw,400px);box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.calcov svg{width:200px;height:auto;max-width:70%}
+.calcov .cat{font-size:18px;font-weight:700;color:var(--ink);margin-top:8px}
+.calcov .cbar2{max-width:300px;height:8px}
+@keyframes ovpop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:no-preference){.calcov:not([hidden]) .box{animation:ovpop .22s ease-out}}
 .dirbox{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:10px}
 .dirbox .dt{font-size:13px;font-weight:700}
 .dirgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -1092,7 +1100,7 @@ html,body{overflow-x:clip}
 <section id="consumo" class="cargas"><div class="wrap">
   <div class="sec-head"><div><div class="eyebrow">Paso 1</div><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué hay en tu casa?</h2></div><p style="color:var(--muted);max-width:56ch">Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.</p></div>
   <div class="cg-grid">
-    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tscroll"><div class="tiles" id="tiles"></div></div><div class="thint">Desliza para ver más artefactos ↓</div><div class="cbwrap"><div class="cbub" id="cbub" aria-hidden="true">👆 ¡Presiona aquí para calcular!</div><button class="btn calcbtn" id="calcbtn" type="button"><span class="cbic">⚡</span> Calcular mi sistema <span class="cbar">→</span></button></div><div class="calcanim" id="anim1" hidden aria-live="polite"><svg width="150" height="130" viewBox="0 -24 130 130" role="img" aria-label="Ingeniero con casco blanco y calculadora; sobre su cabeza una ampolleta encendida indica que está calculando">
+    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tscroll"><div class="tiles" id="tiles"></div></div><div class="thint">Desliza para ver más artefactos ↓</div><div class="cbwrap"><div class="cbub" id="cbub" aria-hidden="true">👆 ¡Presiona aquí para calcular!</div><button class="btn calcbtn" id="calcbtn" type="button"><span class="cbic">⚡</span> Calcular mi sistema <span class="cbar">→</span></button></div><div class="calcanim calcov" id="anim1" hidden role="dialog" aria-modal="true" aria-label="Calculando tu consumo"><div class="box"><svg width="150" height="130" viewBox="0 -24 130 130" role="img" aria-label="Ingeniero con casco blanco y calculadora; sobre su cabeza una ampolleta encendida indica que está calculando">
 <g class="eng-rays" stroke="#F5B21B" stroke-width="2.5" stroke-linecap="round"><path d="M52 -23v3M36 -16l-4 -4M68 -16l4 -4M30 -4h-5M74 -4h5"/></g>
 <g class="eng-bulb"><circle cx="52" cy="-5" r="10" fill="#FFE066" stroke="#E0A800" stroke-width="1.5"/><rect x="47" y="4" width="10" height="6" rx="1.5" fill="#9AA5B1"/><path d="M48 -6q4 6 8 0" stroke="#E0A800" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>
 <g class="eng-bob">
@@ -1104,7 +1112,7 @@ html,body{overflow-x:clip}
 <g class="eng-arm"><rect x="62" y="74" width="30" height="8" rx="4" fill="#F39A1E"/></g>
 <rect x="84" y="64" width="22" height="30" rx="4" fill="#4B5563"/><rect x="87" y="68" width="16" height="7" rx="1.5" fill="#9BE7F0"/>
 <g fill="#CBD5E1"><rect x="87" y="79" width="4" height="4" rx="1"/><rect x="93" y="79" width="4" height="4" rx="1"/><rect x="99" y="79" width="4" height="4" rx="1"/><rect x="87" y="85" width="4" height="4" rx="1"/><rect x="93" y="85" width="4" height="4" rx="1"/><rect x="99" y="85" width="4" height="4" rx="1"/></g>
-</g></svg><div class="cat">Calculando tu consumo de invierno…</div><div class="cbar2"><i></i></div></div><p class="note" id="linkmsg" style="margin:8px 0 0"></p></div>
+</g></svg><div class="cat">Calculando tu consumo de invierno…</div><div class="cbar2"><i></i></div></div></div><p class="note" id="linkmsg" style="margin:8px 0 0"></p></div>
     <div class="cg-res" aria-live="polite">
       <span class="eyebrow">Consumo estimado · mes de invierno</span>
       <div class="gauge">
@@ -1135,7 +1143,7 @@ html,body{overflow-x:clip}
       <div id="map" role="application" aria-label="Mapa para ubicar la vivienda"></div>
       <p class="note" id="msrc" style="margin:-6px 0 0">Si el punto no queda justo sobre tu casa, haz clic sobre tu techo en el mapa. Usa Ctrl + rueda para acercar.</p>
       <button type="button" class="btn calcbtn idle" id="hspbtn"><span class="cbic">☀️</span> Calcular HSP <span class="cbar">→</span></button>
-      <div class="calcanim" id="anim2" hidden aria-live="polite"><svg width="84" height="84" viewBox="0 0 80 80" role="img" aria-label="Sol girando"><g class="eng-sun"><circle cx="40" cy="40" r="14" fill="#F5B21B"/><g stroke="#F5B21B" stroke-width="4" stroke-linecap="round"><path d="M40 10v8M40 62v8M10 40h8M62 40h8M19 19l6 6M55 55l6 6M61 19l-6 6M25 55l-6 6"/></g></g></svg><div class="cat">Consultando al Explorador Solar del Ministerio…</div><div class="cbar2"><i></i></div></div>
+      <div class="calcanim calcov" id="anim2" hidden role="dialog" aria-modal="true" aria-label="Consultando al Explorador Solar"><div class="box"><svg width="84" height="84" viewBox="0 0 80 80" role="img" aria-label="Sol girando"><g class="eng-sun"><circle cx="40" cy="40" r="14" fill="#F5B21B"/><g stroke="#F5B21B" stroke-width="4" stroke-linecap="round"><path d="M40 10v8M40 62v8M10 40h8M62 40h8M19 19l6 6M55 55l6 6M61 19l-6 6M25 55l-6 6"/></g></g></svg><div class="cat">Consultando al Explorador Solar del Ministerio…</div><div class="cbar2"><i></i></div></div></div>
       <div class="hspres" id="hspres" hidden aria-live="polite"></div>
       <details class="adv"><summary>Opciones avanzadas (comuna y horas de sol)</summary>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px"><label for="hreg">Región<select id="hreg"></select></label><label for="hcom">Comuna<select id="hcom"></select></label></div>
@@ -1344,7 +1352,7 @@ html,body{overflow-x:clip}
   }
   window.__linked=false;
   const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('calcbtn').classList.remove('ready');$('cuse').classList.remove('ready');$('cbub').classList.remove('show');$('cbub2').classList.remove('show');$('simulador').scrollIntoView({behavior:'smooth'});};
-  let anim1=false;const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,MS_ANIM=RM?600:2000;
+  document.body.appendChild($('anim1'));document.body.appendChild($('anim2'));let anim1=false;const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,MS_ANIM=RM?600:2000;
   const goCalcAnim=()=>{if(anim1)return;if(!cKwh){goCalc();return;}anim1=true;const a=$('anim1');a.hidden=false;a.classList.remove('run');void a.offsetWidth;a.style.setProperty('--d',MS_ANIM+'ms');a.querySelector('.cbar2 i').style.transitionDuration=MS_ANIM+'ms';a.classList.add('run');$('linkmsg').textContent='';setTimeout(()=>{a.hidden=true;a.classList.remove('run');anim1=false;goCalc();},MS_ANIM);};
   $('cuse').onclick=goCalcAnim;$('calcbtn').onclick=goCalcAnim;
   $('kwh').addEventListener('input',()=>{if(window.__linked){window.__linked=false;$('linkmsg').textContent='Ingresaste un consumo a mano: los artefactos ya no lo cambian. Presiona Calcular para volver a enlazarlos.';if(cKwh){['calcbtn','cuse'].forEach(i=>$(i).classList.add('ready'));$('cbub').classList.add('show');$('cbub2').classList.add('show');}}});
@@ -1445,7 +1453,7 @@ html,body{overflow-x:clip}
     if(busyH)return;
     if(!pend){$('msrc').textContent='Primero ubica tu casa: usa tu ubicación, busca una dirección o haz clic en el mapa.';return;}
     busyH=true;const [lat,lon]=pend,b=$('hspbtn'),an=$('anim2');
-    b.hidden=true;$('hspres').hidden=true;an.hidden=false;an.classList.remove('run');void an.offsetWidth;an.querySelector('.cbar2 i').style.transitionDuration=MS_ANIM+'ms';an.classList.add('run');
+    $('hspres').hidden=true;an.hidden=false;an.classList.remove('run');void an.offsetWidth;an.querySelector('.cbar2 i').style.transitionDuration=MS_ANIM+'ms';an.classList.add('run');
     try{
       const t0=Date.now();const j=await fetchLive(lat,lon);
       await new Promise(r=>setTimeout(r,Math.max(0,MS_ANIM-(Date.now()-t0))));
@@ -1454,7 +1462,7 @@ html,body{overflow-x:clip}
         $('msrc').textContent='Punto '+lat.toFixed(4)+', '+lon.toFixed(4)+': HSP de junio '+fmt(j.hsp_junio)+' h/día. Dato del punto exacto, consultado al Explorador Solar del Ministerio de Energía (panel inclinado a la latitud, orientado al norte).';live=true;}
       if(ok||live){showHsp(live);
         try{const H=window.HSP,r=$('hreg').value,c=$('hcom').value;if(r!==''&&c!==''){$('dreg').value=r;fillDcom();$('dcom').value=c;}}catch(e){}}
-    }finally{an.hidden=true;an.classList.remove('run');b.hidden=false;b.classList.remove('ready');busyH=false;}
+    }finally{an.hidden=true;an.classList.remove('run');b.classList.remove('ready');busyH=false;}
   }
   let map,mk;
   function place(lat,lon,zoom){if(!map)return;const ic=L.divIcon({className:'',html:'<div class="pin"></div>',iconSize:[22,22],iconAnchor:[11,22]});if(mk)mk.setLatLng([lat,lon]);else mk=L.marker([lat,lon],{icon:ic}).addTo(map);if(zoom)map.setView([lat,lon],zoom);apply(lat,lon);}
