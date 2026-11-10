@@ -45,6 +45,10 @@ main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 16px 140px}
 .err{color:var(--err);font-size:13px;margin:8px 2px 0;min-height:18px}
 .cons{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:10px 2px 0}
 .cons a{color:var(--cyan)}
+.lks{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.lks a{color:var(--ink);text-decoration:none;font-weight:700;font-size:14px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--cyan);background:var(--bg)}
+.lks a:hover{background:var(--cyan);color:#06222a}
+.bform{display:grid;gap:8px}.bform select,.bform input{background:var(--surface);border:1.5px solid var(--line);color:var(--ink);font:16px "Archivo",sans-serif;padding:13px;border-radius:14px;min-width:0;width:100%}.bform select:focus,.bform input:focus{outline:none;border-color:var(--cyan)}.bform .b2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bform .acts{display:flex;gap:10px}.bform .acts .opt{min-width:0;flex:0 0 auto;text-align:center}.bform .acts .go{flex:1;padding:13px 20px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .final{display:grid;gap:10px}
 .final a{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font:800 16px "Archivo",sans-serif;padding:16px;border-radius:14px}
@@ -77,6 +81,33 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;',
 function add(who,text){const m=document.createElement('div');m.className='msg '+who;const b=document.createElement('div');b.className='b';b.textContent=text;m.appendChild(b);chat.appendChild(m);scroll()}
 function scroll(){requestAnimationFrame(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}))}
 async function say(...lines){for(const t of lines){const ty=document.createElement('div');ty.className='msg bot typing';ty.innerHTML='<div class="b"><i></i><i></i><i></i></div>';chat.appendChild(ty);scroll();await wait(Math.min(1100,350+t.length*12));ty.remove();add('bot',t)}}
+function addLinks(){const m=document.createElement('div');m.className='msg bot';const b=document.createElement('div');b.className='b';
+  const p=document.createElement('div');p.textContent='Entra a la oficina virtual de tu distribuidora (la que aparece en tu boleta). Ahí puedes descargar tu boleta y ver tu consumo de los últimos 13 meses:';b.appendChild(p);
+  const w=document.createElement('div');w.className='lks';
+  [['CGE','https://www.cge.cl'],['Enel','https://www.enel.cl'],['Chilquinta','https://www.chilquinta.cl']].forEach(([n,u])=>{const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.textContent=n+' ↗';w.appendChild(a)});
+  b.appendChild(w);m.appendChild(b);chat.appendChild(m);scroll()}
+function boletaStep(){return new Promise(async res=>{
+  await say('Si la tienes a mano, puedes adelantar estos datos de tu boleta. Tu número de cliente lo necesitamos para la Solicitud de Conexión ante tu distribuidora. Todo es opcional.');
+  const mn=document.querySelector('main');mn.style.paddingBottom='340px';
+  ctl.innerHTML='<div class="bform"><select id="bd" aria-label="Distribuidora"><option value="">Distribuidora</option><option value="CGE">CGE</option><option value="Enel">Enel</option><option value="Chilquinta">Chilquinta</option><option value="otra">Otra</option></select>'+
+  '<input id="bn" maxlength="15" autocomplete="off" placeholder="N° de cliente (opcional)" aria-label="Número de cliente">'+
+  '<label class="cons" id="bcw" style="display:none"><input type="checkbox" id="bc"> Autorizo el uso de mi número de cliente solo para preparar la Solicitud de Conexión ante mi distribuidora.</label><div class="b2"><input id="bk" inputmode="numeric" maxlength="5" placeholder="kWh del mes" aria-label="Consumo del mes en kWh"><input id="bm" inputmode="numeric" maxlength="8" placeholder="Total a pagar $" aria-label="Total a pagar en pesos"></div>'+
+  '<div class="acts"><button class="opt" id="bo" type="button">Omitir</button><button class="go" id="bs" type="button">Enviar datos</button></div><div class="err" id="be"></div></div>';
+  const $$=i=>document.getElementById(i),fin=t=>{mn.style.paddingBottom='';ctl.innerHTML='';add('me',t);res()};
+  $$('bn').oninput=()=>{$$('bcw').style.display=$$('bn').value.trim()?'flex':'none';scroll()};
+  scroll();
+  $$('bo').onclick=()=>fin('Omitir');
+  $$('bs').onclick=()=>{
+    const dist=$$('bd').value,n=$$('bn').value.trim().replace(/\s+/g,''),k=$$('bk').value.replace(/\D/g,''),m=$$('bm').value.replace(/\D/g,''),er=$$('be');
+    if(n&&!/^[0-9A-Za-z-]{4,15}$/.test(n)){er.textContent='Revisa tu número de cliente (solo letras, números o guion)';return}
+    if(k&&+k>20000){er.textContent='Revisa los kWh del mes';return}
+    if(m&&+m>5000000){er.textContent='Revisa el total a pagar';return}
+    if(n&&!$$('bc').checked){er.textContent='Marca la autorización para usar tu número de cliente, o bórralo';return}
+    if(!dist&&!n&&!k&&!m){fin('Omitir');return}
+    if(dist)d.distribuidora=dist;if(n){d.numero_cliente=n;d.cons_nc=true}if(k)d.boleta_kwh=+k;if(m)d.boleta_monto=+m;
+    fin('Datos de la boleta enviados');
+  };
+})}
 function prog(n){pg.style.width=(n/7*100)+'%'}
 function choose(opts){return new Promise(res=>{ctl.innerHTML='<div class="opts"></div>';const box=ctl.firstChild;opts.forEach(([v,l])=>{const b=document.createElement('button');b.className='opt';b.type='button';b.textContent=l;b.onclick=()=>{ctl.innerHTML='';add('me',l);res(v)};box.appendChild(b)})})}
 function ask(ph,type,check,extra){return new Promise(res=>{
@@ -103,6 +134,7 @@ async function run(){
   await say('¿Tienes a mano tu última boleta de luz?');
   d.tiene_boleta=await choose([[true,'🧾 Sí, la tengo'],[false,'Ahora no']]);prog(5);
   await say(d.tiene_boleta?'Perfecto. Tenla a mano para la visita: su gráfico de los últimos 13 meses nos da tu consumo real, y con eso calculamos tu retorno exacto.':'No hay problema. Para la visita, búscala o descárgala desde la web de tu distribuidora: su gráfico de 13 meses nos da tu consumo real.');
+  if(!d.tiene_boleta)addLinks();else await boletaStep();
   await say('¿Con qué frecuencia te quedas sin luz?');
   d.cortes=await choose([['frecuentes','Varias veces al año'],['a_veces','A veces'],['casi_nunca','Casi nunca']]);prog(6);
   await say('Último paso. ¿Cuál es tu nombre?');
@@ -122,7 +154,7 @@ function phoneStep(){return new Promise(res=>{
     if(!document.getElementById('cs').checked){er.textContent='Debes aceptar el uso de tus datos para que te contactemos';return}
     if(document.getElementById('hp').value||Date.now()-T0<6000){er.textContent='No se pudo enviar. Intenta nuevamente.';return}
     d.telefono=v;ok.disabled=true;ok.textContent='…';
-    const body={nombre:d.nombre,telefono:d.telefono,region:d.region,comuna:d.comuna,consentimiento:true,interes:d.interes,propiedad:d.propiedad,boleta:d.boleta,tiene_boleta:d.tiene_boleta,cortes:d.cortes,origen:d.origen};
+    const body={nombre:d.nombre,telefono:d.telefono,region:d.region,comuna:d.comuna,consentimiento:true,interes:d.interes,propiedad:d.propiedad,boleta:d.boleta,tiene_boleta:d.tiene_boleta,cortes:d.cortes,origen:d.origen,distribuidora:d.distribuidora,numero_cliente:d.numero_cliente,consentimiento_numero_cliente:d.cons_nc,boleta_kwh:d.boleta_kwh,boleta_monto:d.boleta_monto};
     try{
       const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
       if(!r.ok)throw new Error(r.status);

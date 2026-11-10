@@ -1243,7 +1243,10 @@ html,body{overflow-x:clip}
     <label for="comuna">Comuna<input id="comuna" required maxlength="60"></label>
     <label for="techo">Tipo de techo<select id="techo"><option>Teja asfáltica</option><option>Zinc</option><option>Losa</option><option>Otro</option></select></label>
     <label for="fono">Teléfono<input id="fono" type="tel" required pattern="\+?[0-9 ]{8,15}" maxlength="16" autocomplete="tel"></label>
+    <label for="ldist">Distribuidora (opcional)<select id="ldist"><option value="">Selecciona</option><option value="CGE">CGE</option><option value="Enel">Enel</option><option value="Chilquinta">Chilquinta</option><option value="otra">Otra</option></select></label>
+    <label for="lncli">N° de cliente (opcional)<input id="lncli" oninput="document.getElementById('ncwrap').style.display=this.value.trim()?'flex':'none'" maxlength="15" autocomplete="off" placeholder="Lo necesitamos para la Solicitud de Conexión"></label>
     <input type="text" id="web" name="web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+    <label id="ncwrap" style="display:none;gap:8px;align-items:flex-start;font-weight:400;font-size:12px"><input type="checkbox" id="consnc" style="margin-top:3px"> Autorizo el uso de mi número de cliente solo para preparar la Solicitud de Conexión ante mi distribuidora.</label>
     <label style="display:flex;gap:8px;align-items:flex-start;font-weight:400;font-size:12px"><input type="checkbox" id="consent" required style="margin-top:3px"> Acepto que SOLARNIK (IN-ELEC SpA) use mis datos solo para contactarme por esta solicitud, según la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a>.</label>
     <button class="btn calcbtn" id="leadsend" type="submit"><span class="cbic">📩</span> Enviar solicitud <span class="cbar">→</span></button>
     <div class="ok" id="okmsg" role="status"></div>
@@ -1368,6 +1371,9 @@ html,body{overflow-x:clip}
     if($('web').value){$('okmsg').textContent='Solicitud recibida.';return;}
     if(SUPABASE_URL.startsWith('__')){$('okmsg').textContent='Prototipo: el formulario aún no está conectado.';return;}
     const body={nombre:$('nombre').value.trim().slice(0,80),telefono:$('fono').value.trim().slice(0,16),region:$('region').value.slice(0,40),comuna:$('comuna').value.trim().slice(0,60),techo:$('techo').value.slice(0,40),consentimiento:$('consent').checked,kwh_mes:Math.round(+$('kwh').value||0),hsp_junio:Math.round((+$('prod').value||0)*100)/100};
+    {const nc=$('lncli').value.trim().replace(/\s+/g,'');if(nc&&!/^[0-9A-Za-z-]{4,15}$/.test(nc)){$('okmsg').textContent='Revisa tu número de cliente (solo letras, números o guion).';return;}
+     if(nc&&!$('consnc').checked){$('okmsg').textContent='Para usar tu número de cliente, marca la autorización o borra el número.';return;}
+     if(nc){body.numero_cliente=nc;body.consentimiento_numero_cliente=true;}if($('ldist').value)body.distribuidora=$('ldist').value;}
     sending=true;$('okmsg').textContent='Enviando...';
     try{const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
       $('okmsg').textContent=r.ok?'¡Gracias! Te contactaremos pronto.':'No pudimos enviar tu solicitud. Escríbenos por WhatsApp.';if(r.ok)e.target.reset();}
