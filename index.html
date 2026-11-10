@@ -1165,7 +1165,7 @@ html,body{overflow-x:clip}
       <div class="dirbox"><div class="dt">Buscar por dirección</div><div class="dirgrid"><select id="dreg" aria-label="Región"></select><select id="dcom" aria-label="Comuna"></select></div><div class="maptools"><input id="dcalle" placeholder="Calle y número (ej: Los Aromos 123)" aria-label="Calle y número" enterkeyhint="search"><button type="button" id="dbtn">Buscar dirección</button></div></div>
       <div class="maptools"><input id="coord" placeholder="o escribe tu dirección o sector (ej: Pullally, Papudo)" aria-label="Dirección, sector o coordenadas" enterkeyhint="search"><button type="button" id="coordbtn">Buscar</button></div>
       <div id="map" role="application" aria-label="Mapa para ubicar la vivienda"></div>
-      <p class="note" id="msrc" style="margin:-6px 0 0">Si el punto no queda justo sobre tu casa, haz clic sobre tu techo en el mapa. Usa Ctrl + rueda para acercar.</p>
+      <p class="note" id="msrc" style="margin:-6px 0 0">Si el punto no queda justo sobre tu casa, haz clic sobre tu techo en el mapa. <span id="mtip">Usa Ctrl + rueda para acercar.</span></p>
       <button type="button" class="btn calcbtn idle" id="hspbtn"><span class="cbic">☀️</span> Calcular HSP <span class="cbar">→</span></button>
       <div class="calcanim calcov" id="anim2" hidden role="dialog" aria-modal="true" aria-label="Consultando al Explorador Solar"><div class="box"><svg width="84" height="84" viewBox="0 0 80 80" role="img" aria-label="Sol girando"><g class="eng-sun"><circle cx="40" cy="40" r="14" fill="#F5B21B"/><g stroke="#F5B21B" stroke-width="4" stroke-linecap="round"><path d="M40 10v8M40 62v8M10 40h8M62 40h8M19 19l6 6M55 55l6 6M61 19l-6 6M25 55l-6 6"/></g></g></svg><div class="cat">Consultando al Explorador Solar del Ministerio…</div><div class="cbar2"><i></i></div></div></div>
       <div class="hspres" id="hspres" hidden aria-live="polite"></div>
@@ -1498,7 +1498,7 @@ html,body{overflow-x:clip}
   let map,mk;
   function place(lat,lon,zoom){if(!map)return;const ic=L.divIcon({className:'',html:'<div class="pin"></div>',iconSize:[22,22],iconAnchor:[11,22]});if(mk)mk.setLatLng([lat,lon]);else mk=L.marker([lat,lon],{icon:ic}).addTo(map);if(zoom)map.setView([lat,lon],zoom);apply(lat,lon);}
   try{
-    map=L.map('map',{scrollWheelZoom:true}).setView([-33.0,-71.0],6);
+    map=L.map('map',{scrollWheelZoom:true,dragging:!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),tap:false}).setView([-33.0,-71.0],6);
     map.getContainer().addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey){e.preventDefault();}else{e.stopPropagation();}},true);
     const ayuda=L.control({position:'topleft'});ayuda.onAdd=function(){const d=L.DomUtil.create('div');d.style.cssText='margin:6px 0 0 56px;padding:3px 8px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;border-radius:6px;pointer-events:none';d.textContent='Ctrl + rueda para acercar';return d;};ayuda.addTo(map);
     const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes © Esri'});
@@ -1538,7 +1538,9 @@ html,body{overflow-x:clip}
   $('dbtn').onclick=buscarDir;$('dcalle').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscarDir();}});
   $('hspbtn').onclick=calcHSP;
   $('coordbtn').onclick=buscar;$('coord').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscar();}});
-  $('gpsbtn').onclick=()=>{if(!navigator.geolocation){$('msrc').textContent='Tu navegador no entrega la ubicación. Usa el mapa o pega coordenadas.';return;}$('msrc').textContent='Buscando tu ubicación... acepta el permiso que pide tu navegador.';navigator.geolocation.getCurrentPosition(p=>{map?place(p.coords.latitude,p.coords.longitude,17):apply(p.coords.latitude,p.coords.longitude)},()=>{$('msrc').textContent='No se pudo obtener la ubicación (en esta vista previa el navegador la bloquea; en el sitio publicado pedirá permiso). Usa el mapa o pega coordenadas.';},{enableHighAccuracy:true,timeout:10000});};
+  (function(){const IA=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\//i.test(navigator.userAgent);const ayuda=()=>{const d=document.querySelector('.dirbox');if(d&&d.scrollIntoView)d.scrollIntoView({behavior:'smooth',block:'center'});};
+if(IA){const g=$('gpsbtn');if(g){const n=document.createElement('p');n.className='note';n.style.cssText='margin:0 0 8px;color:#b45309;font-weight:600';n.textContent='Estás en el navegador de Facebook/Instagram: ahí la ubicación suele fallar. Abre el link en Chrome (menú ⋮ → «Abrir en el navegador») o busca tu dirección aquí abajo.';g.parentNode.insertBefore(n,g);}}
+$('gpsbtn').onclick=()=>{if(!navigator.geolocation){$('msrc').textContent='Tu navegador no entrega la ubicación. Busca tu dirección o toca el mapa sobre tu casa.';ayuda();return;}$('msrc').textContent='Buscando tu ubicación... acepta el permiso que pide tu navegador.';navigator.geolocation.getCurrentPosition(p=>{map?place(p.coords.latitude,p.coords.longitude,17):apply(p.coords.latitude,p.coords.longitude)},e=>{let m;if(IA)m='El navegador de Facebook/Instagram bloquea la ubicación. Abre el link en Chrome (menú ⋮ → «Abrir en el navegador») o busca tu dirección aquí abajo.';else if(e&&e.code===1)m='El permiso de ubicación está bloqueado. Toca el candado junto a la dirección → Permisos → Ubicación → Permitir y recarga. O busca tu dirección aquí abajo, o toca el mapa sobre tu casa.';else if(e&&e.code===2)m='Tu celular no pudo ubicarte. Activa la ubicación (GPS) en el panel superior, o busca tu dirección aquí abajo.';else m='Tardó demasiado en ubicarte. Intenta de nuevo, o busca tu dirección aquí abajo, o toca el mapa sobre tu casa.';$('msrc').textContent=m;ayuda();},{enableHighAccuracy:false,timeout:15000,maximumAge:60000});};})();
 })();
 </script>
 
@@ -1834,5 +1836,6 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(!document.activeElem
 pinta();
 })();
 </script>
+<script>try{if(window.matchMedia&&matchMedia('(pointer:coarse)').matches){var t=document.getElementById('mtip');if(t)t.textContent='En el celular: desliza con un dedo para seguir bajando; toca el mapa sobre tu casa para poner el punto; acerca con dos dedos (pellizco) o con los botones + y −.';}}catch(e){}</script>
 </body>
 </html>
