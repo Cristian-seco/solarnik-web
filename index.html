@@ -10,6 +10,24 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0F1A1F">
+<style id="tipos-css">
+.tipos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.tipos button{font:600 14px system-ui,sans-serif;padding:10px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:40px}
+.tipos button[aria-pressed="true"]{background:#F39A1E;border-color:#F39A1E;color:#1b1b1b}
+.tile .ed{display:none;grid-column:1/-1;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--muted)}
+.tile.on .ed{display:grid}
+.tile .ed label{display:grid;gap:4px}
+.tile .ed input{width:100%;box-sizing:border-box;font:14px system-ui,sans-serif;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.addc{margin:14px 0 0;border:1px dashed var(--line);border-radius:14px;padding:10px 14px}
+.addc summary{cursor:pointer;font-weight:700}
+.addg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.addg input[type=text],.addg input:not([type]),.addg input[type=number]{width:100%;box-sizing:border-box;font:14px system-ui,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.addg #acn{grid-column:1/-1}
+.addg .acm{grid-column:1/-1;font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.addg .btn{grid-column:1/-1}
+.tlabel{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.thelp{font-size:12px;color:var(--muted);margin:-6px 0 14px}
+</style>
 </head>
 <body>
 <title>SOLARNIK Energía Propia</title>
@@ -1122,9 +1140,13 @@ html,body{overflow-x:clip}
 </div></section>
 
 <section id="consumo" class="cargas"><div class="wrap">
-  <div class="sec-head"><div><div class="eyebrow">Paso 1</div><h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué hay en tu casa?</h2></div><p style="color:var(--muted);max-width:56ch">Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.</p></div>
+  <div class="sec-head"><div><div class="eyebrow">Paso 1</div><h2 id="ptit" style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué hay en tu casa?</h2></div><p id="pdesc" style="color:var(--muted);max-width:56ch">Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.</p></div>
+  <div class="tlabel">Tipo de cliente</div><div class="tipos" id="tipos" role="group" aria-label="Tipo de cliente"><button type="button" data-t="domiciliario" aria-pressed="true">🏠 Domiciliario</button><button type="button" data-t="comercial" aria-pressed="false">🏪 Comercial</button><button type="button" data-t="industrial" aria-pressed="false">🏭 Industrial</button><button type="button" data-t="agricola" aria-pressed="false">🌾 Agrícola</button><button type="button" data-t="institucional" aria-pressed="false">🏫 Institucional</button><button type="button" data-t="apr" aria-pressed="false">💧 APR y cooperativas</button></div>
+  <p class="thelp" id="tinst" hidden>Institucional: colegios, postas, hospitales y recintos municipales.</p>
+  <div id="tarwrap" hidden><div class="tlabel">Tarifa de tu boleta de luz</div><div class="tipos" id="tarifas" role="group" aria-label="Tarifa de la boleta"><button type="button" data-f="bt1" aria-pressed="true">BT1</button><button type="button" data-f="otra" aria-pressed="false">Distinta a BT1 (BT2, BT3, BT4, AT…)</button></div><p class="thelp">La tarifa aparece en tu boleta. Si no la sabes, deja BT1 y lo confirmamos en la cotización.</p></div>
+  <p class="note" id="tnote" hidden style="margin:0 0 14px"></p>
   <div class="cg-grid">
-    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tscroll"><div class="tiles" id="tiles"></div></div><div class="thint">Desliza para ver más artefactos ↓</div><div class="cbwrap"><div class="cbub" id="cbub" aria-hidden="true">👆 ¡Presiona aquí para calcular!</div><button class="btn calcbtn" id="calcbtn" type="button"><span class="cbic">⚡</span> Calcular mi sistema <span class="cbar">→</span></button></div><div class="calcanim calcov" id="anim1" hidden role="dialog" aria-modal="true" aria-label="Calculando tu consumo"><div class="box"><svg width="150" height="130" viewBox="0 -24 130 130" role="img" aria-label="Ingeniero con casco blanco y calculadora; sobre su cabeza una ampolleta encendida indica que está calculando">
+    <div><div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 10px;flex-wrap:wrap"><span><b style="color:#2FB36D">●</b> Bajo</span><span><b style="color:#D9A514">●</b> Medio</span><span><b style="color:#F39A1E">●</b> Alto</span><span><b style="color:#E5483A">●</b> Crítico</span><span>consumo mensual por artefacto</span></div><div class="tscroll"><div class="tiles" id="tiles"></div></div><div class="thint">Desliza para ver más artefactos ↓</div><details class="addc" id="addc"><summary>+ Agregar otra carga</summary><div class="addg"><input id="acn" maxlength="40" placeholder="Nombre (ej: Compresor)" aria-label="Nombre de la carga"><input id="acw" type="number" min="1" step="10" placeholder="Potencia (W)" aria-label="Potencia en watts"><input id="ach" type="number" min="0.1" max="24" step="0.5" placeholder="Horas al día" aria-label="Horas de uso al día"><input id="acq" type="number" min="1" max="40" value="1" aria-label="Cantidad"><label class="acm"><input type="checkbox" id="acm"> Es un motor (partida)</label><button type="button" class="btn" id="acb">Agregar carga</button></div><p class="note" id="acmsg" style="margin:6px 0 0"></p></details><div class="cbwrap"><div class="cbub" id="cbub" aria-hidden="true">👆 ¡Presiona aquí para calcular!</div><button class="btn calcbtn" id="calcbtn" type="button"><span class="cbic">⚡</span> Calcular mi sistema <span class="cbar">→</span></button></div><div class="calcanim calcov" id="anim1" hidden role="dialog" aria-modal="true" aria-label="Calculando tu consumo"><div class="box"><svg width="150" height="130" viewBox="0 -24 130 130" role="img" aria-label="Ingeniero con casco blanco y calculadora; sobre su cabeza una ampolleta encendida indica que está calculando">
 <g class="eng-rays" stroke="#F5B21B" stroke-width="2.5" stroke-linecap="round"><path d="M52 -23v3M36 -16l-4 -4M68 -16l4 -4M30 -4h-5M74 -4h5"/></g>
 <g class="eng-bulb"><circle cx="52" cy="-5" r="10" fill="#FFE066" stroke="#E0A800" stroke-width="1.5"/><rect x="47" y="4" width="10" height="6" rx="1.5" fill="#9AA5B1"/><path d="M48 -6q4 6 8 0" stroke="#E0A800" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>
 <g class="eng-bob">
@@ -1148,7 +1170,7 @@ html,body{overflow-x:clip}
       <div class="row"><span>Inversor sugerido</span><b id="cinv">–</b></div>
       <div class="row"><span>Respaldo nocturno</span><b id="cbat">–</b></div>
       <div class="cbwrap" style="margin-top:44px"><div class="cbub" id="cbub2" aria-hidden="true">👆 ¡Presiona aquí!</div><button class="btn calcbtn" id="cuse" type="button" style="font-size:16px;padding:15px"><span class="cbic">⚡</span> Usar este consumo en la calculadora <span class="cbar">↓</span></button></div>
-      <p class="note" style="margin:0">Calculado para invierno: más horas de luz artificial, calefacción y agua caliente. Tu boleta y la visita técnica dan el valor definitivo.</p>
+      <p class="note" id="cnote" style="margin:0">Calculado para invierno: más horas de luz artificial, calefacción y agua caliente. Tu boleta y la visita técnica dan el valor definitivo.</p>
     </div>
   </div>
 </div></section>
@@ -1158,6 +1180,7 @@ html,body{overflow-x:clip}
     <div class="eyebrow">Paso 2 · Calculadora</div>
     <h2 style="font-size:clamp(28px,4vw,40px);margin:8px 0 12px">¿Qué tamaño de sistema necesitas?</h2>
     <p style="color:var(--muted);margin:0 0 18px;max-width:52ch">Dinos tu consumo y dónde está tu casa. Usamos la radiación solar de junio, el mes con menos sol, del <a href="https://solar.minenergia.cl/exploracion" target="_blank" rel="noopener">Explorador Solar del Ministerio de Energía</a>.</p>
+    <p class="note" id="tnote2" hidden style="margin:-6px 0 14px;max-width:52ch"></p>
     <form id="simform">
       <label for="kwh">Consumo mensual de invierno (kWh, boleta de junio o julio)<input id="kwh" type="number" min="20" step="10" placeholder="Viene del Paso 1 o escríbelo de tu boleta"></label>
       <label style="font-size:15px">Ubica tu casa</label>
@@ -1345,19 +1368,32 @@ html,body{overflow-x:clip}
   // Equipos intermitentes: T = usos/día × minutos/uso ÷ 60 (microondas 6×3 min, hervidor 5×4 min, secador 1×10 min, horno 1×45 min con termostato 60 %, plancha 3 veces/semana × 30 min con termostato 60 %)
   // Cuadro de cargas, invierno: [nombre, P (W), T (h/día), cantidad inicial, motor, FU, FC]. E = P × T × FU × FC; FS se aplica en el dimensionamiento
   const A=[['Refrigerador',150,24,0,1,.35,.85],['Ampolletas LED',10,7,0,0,1,1],['Televisor',100,6,0,0,1,.9],['Computador',80,6,0,0,1,.8],['Router wifi',12,24,0,0,1,1],['Lavadora',500,1,0,1,.8,1],['Microondas',1100,6*3/60,0,0,1,1],['Hervidor',2000,5*4/60,0,0,1,1],['Plancha',1200,3/7*30/60,0,0,1,.6],['Secador de pelo',1500,1*10/60,0,0,1,1],['Horno eléctrico',2000,1*45/60,0,0,1,.6],['Bomba de agua',750,1,0,1,1,1],['Termo eléctrico',1500,3,0,0,.85,1],['Estufa eléctrica',1500,6,0,0,.85,1]];
+  A.forEach((a,i)=>{a[7]=i;});const A0=A.map(a=>a.slice());
   const IC=["<rect x=\"7\" y=\"2\" width=\"18\" height=\"28\" rx=\"3\" fill=\"var(--s)\"/><rect x=\"7\" y=\"2\" width=\"18\" height=\"10\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"10\" y=\"5\" width=\"2\" height=\"4\" rx=\"1\" fill=\"#fff\"/><rect x=\"10\" y=\"15\" width=\"2\" height=\"7\" rx=\"1\" fill=\"var(--p)\"/>", "<path d=\"M16 4a8 8 0 0 0-4.6 14.5c.8.6 1.3 1.5 1.3 2.5h6.6c0-1 .5-1.9 1.3-2.5A8 8 0 0 0 16 4z\" fill=\"var(--p)\"/><rect x=\"12.5\" y=\"22.5\" width=\"7\" height=\"2.5\" rx=\"1\" fill=\"var(--s)\"/><rect x=\"13.5\" y=\"26\" width=\"5\" height=\"2.5\" rx=\"1.2\" fill=\"var(--s)\"/><path d=\"M13.5 10.5a3 3 0 0 1 2.5-2\" stroke=\"#fff\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/>", "<rect x=\"3\" y=\"6\" width=\"26\" height=\"17\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"5.5\" y=\"8.5\" width=\"21\" height=\"12\" rx=\"1.5\" fill=\"var(--s)\"/><path d=\"M11 28h10M16 23v5\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/>", "<rect x=\"6\" y=\"6\" width=\"20\" height=\"14\" rx=\"2\" fill=\"var(--p)\"/><rect x=\"8.5\" y=\"8.5\" width=\"15\" height=\"9\" rx=\"1\" fill=\"var(--s)\"/><path d=\"M3 22h26l-2 4H5z\" fill=\"var(--p)\"/>", "<rect x=\"4\" y=\"16\" width=\"24\" height=\"10\" rx=\"3\" fill=\"var(--p)\"/><circle cx=\"9\" cy=\"21\" r=\"1.4\" fill=\"var(--s)\"/><circle cx=\"13\" cy=\"21\" r=\"1.4\" fill=\"var(--s)\"/><path d=\"M9 16V7M23 16V7\" stroke=\"var(--p)\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M12 9a6 6 0 0 1 8 0M14 12a3 3 0 0 1 4 0\" stroke=\"var(--s)\" stroke-width=\"1.8\" fill=\"none\" stroke-linecap=\"round\"/>", "<rect x=\"5\" y=\"3\" width=\"22\" height=\"26\" rx=\"3\" fill=\"var(--s)\"/><rect x=\"5\" y=\"3\" width=\"22\" height=\"6\" rx=\"3\" fill=\"var(--p)\"/><circle cx=\"16\" cy=\"18.5\" r=\"7\" fill=\"var(--p)\"/><path d=\"M10.5 19.5c2-1.6 3.6 1.4 5.5 0s3.6-1.5 5.5 0v1a5.5 5.5 0 0 1-11 0z\" fill=\"var(--s)\"/><circle cx=\"9\" cy=\"6\" r=\"1.2\" fill=\"#fff\"/>", "<rect x=\"3\" y=\"7\" width=\"26\" height=\"18\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"6\" y=\"10\" width=\"15\" height=\"12\" rx=\"1.5\" fill=\"var(--s)\"/><circle cx=\"25\" cy=\"12\" r=\"1.3\" fill=\"var(--s)\"/><circle cx=\"25\" cy=\"16\" r=\"1.3\" fill=\"var(--s)\"/><rect x=\"23.7\" y=\"19\" width=\"2.6\" height=\"3\" rx=\"1\" fill=\"var(--s)\"/>", "<path d=\"M9 12h13l2 15H7z\" fill=\"var(--p)\"/><path d=\"M11 12l1.5-5h6l1.5 5\" fill=\"var(--s)\"/><path d=\"M24 15h2a3 3 0 0 1 0 6h-2.4\" stroke=\"var(--p)\" stroke-width=\"2.4\" fill=\"none\"/><path d=\"M13 4c0-1.2 1-1.2 1-2.4M17 4c0-1.2 1-1.2 1-2.4\" stroke=\"var(--s)\" stroke-width=\"1.6\" stroke-linecap=\"round\"/>", "<path d=\"M4 23h22a2 2 0 0 0 2-2c0-6-4-11-11-11H11L4 23z\" fill=\"var(--p)\"/><path d=\"M11 10V7h9\" stroke=\"var(--p)\" stroke-width=\"2.4\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M9 19h15\" stroke=\"var(--s)\" stroke-width=\"2\" stroke-linecap=\"round\"/><path d=\"M8 27h3M14 27h3M20 27h3\" stroke=\"var(--s)\" stroke-width=\"1.8\" stroke-linecap=\"round\"/>", "<path d=\"M4 11a7 7 0 0 1 7-7h12v13H11a7 7 0 0 1-7-6z\" fill=\"var(--p)\"/><circle cx=\"11\" cy=\"10.5\" r=\"3\" fill=\"var(--s)\"/><path d=\"M14 17l-2.5 11h5L18 17\" fill=\"var(--p)\"/><path d=\"M26 7h3M26 11h3M26 15h3\" stroke=\"var(--s)\" stroke-width=\"1.8\" stroke-linecap=\"round\"/>", "<rect x=\"4\" y=\"3\" width=\"24\" height=\"26\" rx=\"3\" fill=\"var(--p)\"/><rect x=\"7\" y=\"11\" width=\"18\" height=\"14\" rx=\"2\" fill=\"var(--s)\"/><circle cx=\"9\" cy=\"7\" r=\"1.4\" fill=\"var(--s)\"/><circle cx=\"14\" cy=\"7\" r=\"1.4\" fill=\"var(--s)\"/><rect x=\"18\" y=\"6\" width=\"7\" height=\"2\" rx=\"1\" fill=\"var(--s)\"/><path d=\"M11 20c1.5-1 3 1 4.5 0s3-1 4.5 0\" stroke=\"var(--p)\" stroke-width=\"1.6\" fill=\"none\"/>", "<circle cx=\"12\" cy=\"17\" r=\"8\" fill=\"var(--p)\"/><circle cx=\"12\" cy=\"17\" r=\"3\" fill=\"var(--s)\"/><path d=\"M20 17h8M28 13v8\" stroke=\"var(--p)\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M12 9V4M9 4h6\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/><path d=\"M24 25c-1.3 1.7-2 2.6-2 3.4a2 2 0 0 0 4 0c0-.8-.7-1.7-2-3.4z\" fill=\"var(--s)\"/>", "<rect x=\"8\" y=\"2\" width=\"16\" height=\"24\" rx=\"8\" fill=\"var(--s)\"/><rect x=\"8\" y=\"2\" width=\"16\" height=\"9\" rx=\"8\" fill=\"var(--p)\"/><path d=\"M16 14c-2 2.6-3 4-3 5.4a3 3 0 0 0 6 0c0-1.4-1-2.8-3-5.4z\" fill=\"var(--p)\"/><path d=\"M12 26v4M20 26v4\" stroke=\"var(--p)\" stroke-width=\"2.4\" stroke-linecap=\"round\"/>", "<rect x=\"4\" y=\"10\" width=\"24\" height=\"16\" rx=\"3\" fill=\"var(--p)\"/><path d=\"M9 13v10M13.7 13v10M18.3 13v10M23 13v10\" stroke=\"var(--s)\" stroke-width=\"2.2\" stroke-linecap=\"round\"/><path d=\"M10 7c-1-1.5 1-2.5 0-4M16 7c-1-1.5 1-2.5 0-4M22 7c-1-1.5 1-2.5 0-4\" stroke=\"var(--p)\" stroke-width=\"1.8\" fill=\"none\" stroke-linecap=\"round\"/>"];
   const ICC=["#13A8BE", "#E0A21B", "#7C8C95", "#7C8C95", "#7C8C95", "#2F7DC4", "#E5633A", "#E5633A", "#9B6BD3", "#9B6BD3", "#E5633A", "#2F7DC4", "#E5483A", "#E5483A"],ICT=["#BFE9F0", "#FBE2A6", "#C9D3D8", "#C9D3D8", "#C9D3D8", "#C9E3F6", "#F7C6B4", "#F7C6B4", "#DCCBF2", "#DCCBF2", "#F7C6B4", "#C9E3F6", "#F8C3BE", "#F8C3BE"];
   const q=A.map(a=>a[3]),UF=A.map(()=>1);
   const tiles=$('tiles');
   const LV=k=>k<15?['bajo','#2FB36D']:k<40?['medio','#D9A514']:k<100?['alto','#F39A1E']:['crítico','#E5483A'];
   const LP=k=>{const T=[0,15,40,100,300];for(let x=0;x<4;x++)if(k<T[x+1]||x===3)return Math.min(97,Math.max(3,25*x+25*Math.min(1,(k-T[x])/(T[x+1]-T[x]))));};
-  A.forEach((a,i)=>{const d=document.createElement('div');d.className='tile';let k=a[1]*a[2]*a[5]*a[6]*30/1000,[ln,lc]=LV(k);window.__luzId=window.__luzId||0;d.style.setProperty('--k',lc);
-    d.innerHTML='<svg class="ai" viewBox="0 0 32 32" aria-hidden="true" style="--p:'+ICC[i]+';--s:'+ICT[i]+'">'+(IC[i]||'')+'</svg><span>'+a[0]+'</span><div class="ctr"><button type="button" aria-label="Quitar '+a[0]+'">−</button><b>'+q[i]+'</b><button type="button" aria-label="Agregar '+a[0]+'">+</button></div><div class="lvl"><div class="bar"><i style="left:'+LP(k)+'%"></i></div><div class="tx"><em>Consumo '+ln+'</em><small></small></div></div><label class="uso">Uso diario<select aria-label="Uso diario de '+a[0]+'"><option value="0.5">Poco uso</option><option value="1" selected>Uso normal</option><option value="1.5">Uso intenso</option></select></label>';
+  const GEN_IC='<path d="M13 3 5 17h6l-1 12 9-16h-6z" fill="var(--p)"/>';
+  function buildTiles(){
+  tiles.innerHTML='';
+  A.forEach((a,i)=>{const d=document.createElement('div');d.className='tile';let k=0,ln='',lc='';window.__luzId=window.__luzId||0;
+    const ix=(a[7]>=0&&a[7]<IC.length)?a[7]:-1,icp=ix>=0?ICC[ix]:'#7C8C95',ics=ix>=0?ICT[ix]:'#C9D3D8',icb=ix>=0?(IC[ix]||''):GEN_IC;
+    const nm=String(a[0]).replace(/[<>&"]/g,'');
+    d.innerHTML='<svg class="ai" viewBox="0 0 32 32" aria-hidden="true" style="--p:'+icp+';--s:'+ics+'">'+icb+'</svg><span>'+nm+'</span><div class="ctr"><button type="button" aria-label="Quitar '+nm+'">−</button><b>'+q[i]+'</b><button type="button" aria-label="Agregar '+nm+'">+</button></div><div class="lvl"><div class="bar"><i></i></div><div class="tx"><em></em><small></small></div></div><label class="uso">Uso diario<select aria-label="Uso diario de '+nm+'"><option value="0.5">Poco uso</option><option value="1">Uso normal</option><option value="1.5">Uso intenso</option></select></label><div class="ed"><label>Potencia (W)<input class="ew" type="number" min="1" step="10" value="'+a[1]+'" aria-label="Potencia de '+nm+' en watts"></label><label>Horas al día<input class="eh" type="number" min="0.1" max="24" step="0.5" value="'+(Math.round(a[2]*10)/10)+'" aria-label="Horas al día de '+nm+'"></label></div>';
+    const sel=d.querySelector('.uso select');sel.value=String(UF[i]);
     const tot=()=>{d.querySelector('.tx small').textContent=(k<10?k.toFixed(1).replace('.',','):Math.round(k))+' kWh/mes c/u'+(q[i]>1?' · '+Math.round(k*q[i])+' total':'');};
+    const rk=()=>{k=a[1]*a[2]*UF[i]*a[5]*a[6]*30/1000;[ln,lc]=LV(k);d.style.setProperty('--k',lc);d.querySelector('.bar i').style.left=LP(k)+'%';d.querySelector('.tx em').textContent='Consumo '+ln;tot();};
     const [m,p]=d.querySelectorAll('button');
     const upd=dv=>{q[i]=Math.max(0,Math.min(40,q[i]+dv));d.querySelector('b').textContent=q[i];tot();d.classList.toggle('on',q[i]>0);d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop');cargas();if(window.__luzCarga){let nx=-1;for(let t=1;t<A.length;t++){const j=(i+t)%A.length;if(!q[j]){nx=j;break}}window.__luzCarga({id:++window.__luzId,name:a[0],q:q[i],dv,n:q.filter(x=>x>0).length,kwh:cKwh,next:nx,nextName:nx>=0?A[nx][0]:''})}};
-    m.onclick=()=>upd(-1);p.onclick=()=>upd(1);tot();
-    d.querySelector('.uso select').onchange=ev=>{UF[i]=+ev.target.value;k=a[1]*a[2]*UF[i]*a[5]*a[6]*30/1000;[ln,lc]=LV(k);d.style.setProperty('--k',lc);d.querySelector('.bar i').style.left=LP(k)+'%';d.querySelector('.tx em').textContent='Consumo '+ln;tot();cargas();};d.classList.toggle('on',q[i]>0);tiles.appendChild(d);});
+    m.onclick=()=>upd(-1);p.onclick=()=>upd(1);
+    sel.onchange=ev=>{UF[i]=+ev.target.value;rk();cargas();};
+    d.querySelector('.ew').oninput=ev=>{const v=+ev.target.value;if(v>0&&v<=500000){a[1]=v;rk();cargas();}};
+    d.querySelector('.eh').oninput=ev=>{const v=+ev.target.value;if(v>0&&v<=24){a[2]=v;rk();cargas();}};
+    rk();d.classList.toggle('on',q[i]>0);tiles.appendChild(d);});
+  }
+  buildTiles();
   let shown=0,anim;
   function count(to){cancelAnimationFrame(anim);const from=shown,t0=performance.now();const st=t=>{const k=Math.min(1,(t-t0)/600);shown=from+(to-from)*(1-Math.pow(1-k,3));$('ckwh').textContent=Math.round(shown);if(k<1)anim=requestAnimationFrame(st)};anim=requestAnimationFrame(st);}
   let cKwh=0;
@@ -1366,12 +1402,12 @@ html,body{overflow-x:clip}
     A.forEach((a,i)=>{if(!q[i])return;e+=a[1]*a[2]*UF[i]*a[5]*a[6]*q[i];p+=a[1]*q[i];if(a[4])big.push(a[1]*2);});
     cKwh=Math.round(e*30/1000);
     const sim=p*0.55+Math.max(0,...big,0)*0.5, kw=sim*1.25/1000;
-    const inv=[3.6,5,6,8,10,12].find(x=>x>=kw)||12;
+    const invF=[3.6,5,6,8,10,12].find(x=>x>=kw),inv=invF||12;
     const bat=e/1000*0.45, nb=Math.max(1,Math.ceil(bat/5.1));
     count(cKwh);
     $('cring').style.strokeDashoffset=503*(1-Math.min(1,cKwh/600));
     $('ckw').textContent=kw.toFixed(1).replace('.',',')+' kW';
-    $('cinv').textContent=String(inv).replace('.',',')+' kW';
+    $('cinv').textContent=invF?String(inv).replace('.',',')+' kW':'Más de 12 kW · se dimensiona en el proyecto';
     $('cbat').textContent=bat.toFixed(1).replace('.',',')+' kWh · '+nb+' batería'+(nb>1?'s':'');
     if(!cKwh){['ckw','cinv','cbat'].forEach(i=>$(i).textContent='–');}
     const b=$('bolt');b.classList.remove('zap');void b.offsetWidth;b.classList.add('zap');
@@ -1379,6 +1415,41 @@ html,body{overflow-x:clip}
     {const cb=$('calcbtn'),bu=$('cbub'),cu=$('cuse'),bu2=$('cbub2');if(cb){const rdy=cKwh>0&&!window.__linked;[cb,cu].forEach(x=>{x.classList.toggle('ready',rdy);x.classList.toggle('idle',!cKwh);});bu.classList.toggle('show',rdy);bu2.classList.toggle('show',rdy);bu.textContent=window.__linked?'':'👆 ¡Presiona aquí para calcular!';}}
   }
   window.__linked=false;
+  // Perfiles por tipo de cliente. [nombre, W, horas/día equivalentes, cantidad inicial, motor, FU, FC, icono]. Valores REFERENCIALES, el usuario los edita.
+  const CB=n=>A0.filter(a=>n.includes(a[0])).map(a=>a.slice());
+  const PRE={
+   domiciliario:{t:'¿Qué hay en tu casa?',d:'Marca tus artefactos y cuántos tienes. Estimamos tu consumo y la potencia que debe sostener el sistema cuando se corta la luz.',n:'',a:A0.map(a=>a.slice())},
+   comercial:{t:'¿Qué cargas tiene tu negocio o local comercial?',d:'Marca los equipos de tu local. Ajusta la potencia (W) y las horas de uso: un negocio que abre 10 horas no consume igual que una casa.',n:1,a:[['Vitrina o refrigerador comercial',300,24,0,1,.5,.9,0],['Congelador comercial',350,24,0,1,.5,.9,0],['Luminarias LED del local',18,10,0,0,1,1,1],['Computador y caja',80,10,0,0,1,.8,3],['Router wifi',12,24,0,0,1,1,4],['Cámaras CCTV y grabador',60,24,0,0,1,1,-1],['Letrero luminoso',100,12,0,0,1,1,-1],['Aire acondicionado',1200,6,0,1,.8,.7,-1],['Horno o cocina eléctrica',2000,3,0,0,1,.6,10],['Hervidor',2000,5*4/60,0,0,1,1,7],['Bomba de agua',750,1,0,1,1,1,11]]},
+   agricola:{t:'¿Qué cargas tiene tu predio, parcela o sistema de agua?',d:'Marca bombas y equipos del predio (riego, pozo, cámara de frío). Ajusta potencia y horas según los datos de placa y la temporada.',n:1,a:[['Bomba sumergible pozo 1 HP',750,2,0,1,1,1,11],['Bomba sumergible pozo 2 HP',1500,2,0,1,1,1,11],['Bomba presurizadora',370,2,0,1,1,1,11],['Bomba de riego 3 HP',2200,3,0,1,1,1,11],['Cámara de frío o packing',2200,12,0,1,.5,.9,0],['Iluminación de galpón',150,6,0,0,1,1,1],['Refrigerador',150,24,0,1,.35,.85,0],['Ampolletas LED de la vivienda',10,7,0,0,1,1,1],['Router wifi',12,24,0,0,1,1,4]]},
+   institucional:{t:'¿Qué cargas tiene tu establecimiento?',d:'Colegios, postas, hospitales y recintos municipales. Marca los equipos y ajusta potencia y horas según jornada y turnos.',n:1,a:[['Luminarias LED',36,10,0,0,1,1,1],['Computadores',80,8,0,0,1,.8,3],['Proyector o pantalla',250,4,0,0,1,1,2],['Router y equipos de red',12,24,0,0,1,1,4],['Aire acondicionado o climatización',1200,6,0,1,.8,.7,-1],['Estufa eléctrica',1500,5,0,0,.85,1,13],['Refrigerador de vacunas o casino',200,24,0,1,.5,.85,0],['Equipos médicos (monitor, ECG, otros)',200,8,0,0,1,.8,-1],['Esterilizador o autoclave',1500,2,0,0,1,.8,-1],['Fotocopiadora o impresora',600,2,0,0,1,1,-1],['Hervidor',2000,1,0,0,1,1,7],['Microondas',1100,1,0,0,1,1,6],['Bomba de agua',1500,2,0,1,1,1,11]]},
+   apr:{t:'¿Qué cargas tiene tu APR o cooperativa?',d:'Agua potable rural y cooperativas de agua o de servicios. La potencia de las bombas depende del proyecto: ajusta los valores con los datos de placa.',n:1,a:[['Bomba de pozo (7,5 HP)',5500,8,0,1,1,1,11],['Bomba de impulsión (5 HP)',3700,8,0,1,1,1,11],['Bomba de reserva (3 HP)',2200,4,0,1,1,1,11],['Dosificador de cloro',100,24,0,0,1,1,-1],['Control y telemetría',60,24,0,0,1,1,4],['Iluminación y oficina',200,10,0,0,1,1,1],['Computador de oficina',80,9,0,0,1,.8,3],['Aire acondicionado o estufa de oficina',1500,6,0,0,.85,1,13]]},
+   industrial:{t:'¿Qué cargas tiene tu industria?',d:'Marca los equipos de tu planta. Ajusta potencia y horas según turnos y datos de placa: la demanda máxima define el tamaño del sistema.',n:1,a:[['Motor 5,5 kW',5500,8,0,1,.7,.8,-1],['Motor 15 kW',15000,8,0,1,.7,.8,-1],['Compresor 7,5 kW',7500,8,0,1,.7,.8,-1],['Cinta transportadora 1,5 kW',1500,8,0,1,.8,.8,-1],['Refrigeración o cámara de frío',2200,24,0,1,.5,.9,0],['Iluminación industrial LED',150,10,0,0,1,1,1],['Climatización de oficinas',3500,8,0,1,.8,.7,-1],['Computadores y oficina',80,9,0,0,1,.8,3],['Soldadora',6000,2,0,0,.5,.8,-1]]}
+  };
+  const NOTE_BT1='Valores referenciales: edita la potencia (W) y las horas de cada carga con los datos de tus equipos. El ahorro en $ del Paso 2 usa la tarifa BT1 de tu comuna.';
+  const NOTE_OTRA='Con una tarifa distinta a BT1 la energía y la demanda máxima se cobran de otra forma. Por eso el ahorro en $ del Paso 2 se calcula con BT1 y es solo referencial; lo calculamos con tu boleta en la cotización.';
+  window.__perfil={tipo:'domiciliario',tarifa:'bt1'};
+  function textos(){const pf=window.__perfil,P=PRE[pf.tipo];
+    $('ptit').textContent=P.t;$('pdesc').textContent=P.d;
+    const dom=pf.tipo==='domiciliario',otra=!dom&&pf.tarifa==='otra';
+    const tn=$('tnote');tn.hidden=dom;tn.textContent=dom?'':(otra?NOTE_OTRA:NOTE_BT1);
+    $('tarwrap').hidden=dom;$('tinst').hidden=pf.tipo!=='institucional';
+    const n2=$('tnote2');if(n2){n2.hidden=!otra;n2.textContent=otra?NOTE_OTRA:'';}
+    const cn=$('cnote');if(cn)cn.textContent=dom?'Calculado para invierno: más horas de luz artificial, calefacción y agua caliente. Tu boleta y la visita técnica dan el valor definitivo.':'Consumo mensual estimado con los valores de la tabla. Para este tipo de cliente el valor definitivo sale de tus boletas y de la visita técnica.';
+    document.querySelectorAll('#tipos button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===pf.tipo?'true':'false'));
+    document.querySelectorAll('#tarifas button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===pf.tarifa?'true':'false'));
+  }
+  function setTipo(key){const P=PRE[key];if(!P)return;window.__perfil.tipo=key;if(key==='domiciliario')window.__perfil.tarifa='bt1';
+    A.length=0;P.a.forEach(r=>A.push(r.slice()));q.length=0;UF.length=0;A.forEach(a=>{q.push(a[3]);UF.push(1);});
+    buildTiles();cargas();textos();
+    const sc=document.querySelector('.tscroll');if(sc)sc.scrollTop=0;
+  }
+  document.querySelectorAll('#tarifas button').forEach(b=>b.onclick=()=>{window.__perfil.tarifa=b.dataset.f;textos();});
+  document.querySelectorAll('#tipos button').forEach(b=>b.onclick=()=>setTipo(b.dataset.t));
+  $('acb').onclick=()=>{const n=($('acn').value||'').trim().replace(/[<>&"]/g,'').slice(0,40),w=+$('acw').value,hh=+$('ach').value,c=Math.max(1,Math.min(40,Math.round(+$('acq').value||1))),mo=$('acm').checked?1:0,ms=$('acmsg');
+    if(!n||!(w>0)||w>500000||!(hh>0)||hh>24){ms.textContent='Completa nombre, potencia (W) y horas al día (hasta 24).';return;}
+    A.push([n,w,hh,c,mo,1,1,-1]);q.push(c);UF.push(1);buildTiles();cargas();
+    ['acn','acw','ach'].forEach(x=>$(x).value='');$('acq').value=1;$('acm').checked=false;ms.textContent='Agregada: '+n+' (×'+c+'). Está al final de la lista.';
+    const sc=document.querySelector('.tscroll');if(sc)sc.scrollTop=sc.scrollHeight;};
   const goCalc=()=>{if(!cKwh){$('linkmsg').textContent='Marca al menos un artefacto para calcular.';return;}window.__linked=true;$('kwh').value=cKwh;calc();$('linkmsg').textContent='Listo: el cálculo se actualiza solo cada vez que cambies un artefacto.';$('calcbtn').classList.remove('ready');$('cuse').classList.remove('ready');$('cbub').classList.remove('show');$('cbub2').classList.remove('show');$('simulador').scrollIntoView({behavior:'smooth'});};
   document.body.appendChild($('anim1'));document.body.appendChild($('anim2'));let anim1=false;const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,MS_ANIM=RM?600:2000;
   const goCalcAnim=()=>{if(anim1)return;if(!cKwh){goCalc();return;}anim1=true;const a=$('anim1');a.hidden=false;a.classList.remove('run');void a.offsetWidth;a.style.setProperty('--d',MS_ANIM+'ms');a.querySelector('.cbar2 i').style.transitionDuration=MS_ANIM+'ms';a.classList.add('run');$('linkmsg').textContent='';setTimeout(()=>{a.hidden=true;a.classList.remove('run');anim1=false;goCalc();},MS_ANIM);};
