@@ -1500,7 +1500,9 @@ html,body{overflow-x:clip}
   try{
     map=L.map('map',{scrollWheelZoom:true,dragging:!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),tap:false}).setView([-33.0,-71.0],6);
     map.getContainer().addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey){e.preventDefault();}else{e.stopPropagation();}},true);
-    const ayuda=L.control({position:'topleft'});ayuda.onAdd=function(){const d=L.DomUtil.create('div');d.style.cssText='margin:6px 0 0 56px;padding:3px 8px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;border-radius:6px;pointer-events:none';d.textContent='Ctrl + rueda para acercar';return d;};ayuda.addTo(map);
+    const ayuda=L.control({position:'topleft'});ayuda.onAdd=function(){const d=L.DomUtil.create('div');d.style.cssText='margin:6px 0 0 56px;padding:3px 8px;background:rgba(0,0,0,.55);color:#fff;font:12px sans-serif;border-radius:6px;pointer-events:none';d.textContent='Ctrl + rueda para acercar';return d;};const TOUCH=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+    if(TOUCH){const mv=L.control({position:'topright'});mv.onAdd=function(){const b=L.DomUtil.create('button');b.type='button';b.textContent='✋ Mover mapa';b.setAttribute('aria-pressed','false');b.style.cssText='padding:10px 14px;background:#fff;color:#1F2D35;font:700 14px sans-serif;border:2px solid #F39A1E;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.35)';L.DomEvent.disableClickPropagation(b);b.addEventListener('click',function(){if(map.dragging.enabled()){map.dragging.disable();b.textContent='✋ Mover mapa';b.setAttribute('aria-pressed','false');b.style.background='#fff';}else{map.dragging.enable();b.textContent='📍 Listo, fijar mapa';b.setAttribute('aria-pressed','true');b.style.background='#FFE3B0';}});return b;};mv.addTo(map);}
+    else{ayuda.addTo(map);}
     const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes © Esri'});
     const lbl=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19});
     const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'});
@@ -1836,6 +1838,6 @@ document.addEventListener('focusout',()=>setTimeout(()=>{if(!document.activeElem
 pinta();
 })();
 </script>
-<script>try{if(window.matchMedia&&matchMedia('(pointer:coarse)').matches){var t=document.getElementById('mtip');if(t)t.textContent='En el celular: desliza con un dedo para seguir bajando; toca el mapa sobre tu casa para poner el punto; acerca con dos dedos (pellizco) o con los botones + y −.';}}catch(e){}</script>
+<script>try{if(window.matchMedia&&matchMedia('(pointer:coarse)').matches){var t=document.getElementById('mtip');if(t)t.textContent='En el celular: desliza con un dedo para seguir bajando; toca el mapa sobre tu casa para poner el punto; para mover el mapa toca «✋ Mover mapa» (arriba a la derecha) y arrástralo; acerca con dos dedos o con + y −.';}}catch(e){}</script>
 </body>
 </html>
